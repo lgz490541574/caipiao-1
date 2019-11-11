@@ -45,6 +45,7 @@ public class OrderSplitTools {
         return ticketInfos;
     }
 
+
     /**
      * 龙虎斗
      *
@@ -139,7 +140,7 @@ public class OrderSplitTools {
         return ticketInfos;
     }
 
-    private static List<TicketInfo> getK3EthdxTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] code) {
+    public static List<TicketInfo> getK3EthdxTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] code) {
         List<List<String>> dimValue = new ArrayList<>();
         for (int i = 0; i < code.length; i++) {
             List<String> chList = new ArrayList<>();
@@ -268,7 +269,7 @@ public class OrderSplitTools {
      * @param code
      * @return
      */
-    private static List<TicketInfo> buildTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] code) {
+    public static List<TicketInfo> buildTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] code) {
         List<TicketInfo> ticketInfos = new ArrayList<>();
         for (String item : code) {
             TicketInfo ticketInfo = new TicketInfo();
@@ -390,7 +391,7 @@ public class OrderSplitTools {
             }
         }
     }
-    private static List<String> sortList(String[] a, int num) {
+    public static List<String> sortList(String[] a, int num) {
         List<String> list = new ArrayList<String>();
         List<String> result = combine(a, num);
         for (String s : result) {

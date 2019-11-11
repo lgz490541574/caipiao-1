@@ -3,7 +3,6 @@ package com.lottery.domain.model.playtype;
 import com.common.util.IGlossary;
 import com.lottery.domain.TicketInfo;
 import com.lottery.domain.model.LotteryCategoryEnum;
-import com.lottery.domain.util.PlayOrderSplitUtil;
 import com.lottery.domain.util.*;
 
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ public enum KsPlayTypeEnum implements IGlossary, IPlayType {
             },
             ((LotteryCategoryEnum lotteryType, String playName, String ...code) -> {
                 String[] itemList = code[0].split(",");
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, itemList);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, itemList);
             }),
             new TicketRule[]{new TicketRule("",
                     new String[]{"3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "大", "小", "单", "双"})}
@@ -97,7 +96,7 @@ public enum KsPlayTypeEnum implements IGlossary, IPlayType {
             },
             ((LotteryCategoryEnum lotteryType, String playName, String ...code) -> {
                 String[] itemList = code[0].split(",");
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, itemList);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, itemList);
             }),
             new TicketRule[]{new TicketRule("", new String[]{"三同号通选"})}
     ),
@@ -132,7 +131,7 @@ public enum KsPlayTypeEnum implements IGlossary, IPlayType {
                 @Override
                 public List<TicketInfo> doSplit(LotteryCategoryEnum lotteryType, String playType, String ...codes) {
                     String[] itemList = codes[0].split(",");
-                    return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playType, itemList);
+                    return OrderSplitTools.buildTicketInfos(lotteryType, playType, itemList);
                 }
             },
             new TicketRule[]{new TicketRule("", new String[]{"111", "222", "333", "444", "555", "666"})}
@@ -180,8 +179,8 @@ public enum KsPlayTypeEnum implements IGlossary, IPlayType {
                 @Override
                 public List<TicketInfo> doSplit(LotteryCategoryEnum lotteryType, String playType, String ...codes) {
                     String[] items = codes[0].split(",");
-                    List<String> result = PlayOrderSplitUtil.sortList(items, 3);
-                    return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playType, result.toArray(new String[result.size()]));
+                    List<String> result = OrderSplitTools.sortList(items, 3);
+                    return OrderSplitTools.buildTicketInfos(lotteryType, playType, result.toArray(new String[result.size()]));
                 }
             },
             new TicketRule[]{
@@ -222,7 +221,7 @@ public enum KsPlayTypeEnum implements IGlossary, IPlayType {
                 @Override
                 public List<TicketInfo> doSplit(LotteryCategoryEnum lotteryType, String playType, String ...codes) {
                     String[] itemList = codes[0].split(",");
-                    return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playType, itemList);
+                    return OrderSplitTools.buildTicketInfos(lotteryType, playType, itemList);
                 }
             },
             new TicketRule[]{new TicketRule("", new String[]{"三连号通选"})}
@@ -264,7 +263,7 @@ public enum KsPlayTypeEnum implements IGlossary, IPlayType {
                 @Override
                 public List<TicketInfo> doSplit(LotteryCategoryEnum lotteryType, String playType, String ...codes) {
                     String[] itemList = codes[0].split(",");
-                    return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playType, itemList);
+                    return OrderSplitTools.buildTicketInfos(lotteryType, playType, itemList);
                 }
             },
             new TicketRule[]{new TicketRule("", new String[]{"11", "22", "33", "44", "55", "66"})}
@@ -304,7 +303,7 @@ public enum KsPlayTypeEnum implements IGlossary, IPlayType {
             new IOrderSplit() {
                 @Override
                 public List<TicketInfo> doSplit(LotteryCategoryEnum lotteryType, String playType, String ...code) {
-                    return PlayOrderSplitUtil.getK3EthdxTicketInfos(lotteryType, playType,code);
+                    return OrderSplitTools.getK3EthdxTicketInfos(lotteryType, playType,code);
                 }
             },
             new TicketRule[]{new TicketRule("", new String[]{"11", "22", "33", "44", "55", "66"}),
@@ -347,8 +346,8 @@ public enum KsPlayTypeEnum implements IGlossary, IPlayType {
                 @Override
                 public List<TicketInfo> doSplit(LotteryCategoryEnum lotteryType, String playType, String ...code) {
                     String[] items = code[0].split(",");
-                    List<String> result = PlayOrderSplitUtil.sortList(items, 2);
-                    return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playType, result.toArray(new String[result.size()]));
+                    List<String> result = OrderSplitTools.sortList(items, 2);
+                    return OrderSplitTools.buildTicketInfos(lotteryType, playType, result.toArray(new String[result.size()]));
                 }
             },
             new TicketRule[]{
