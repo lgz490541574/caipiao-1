@@ -17,6 +17,11 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>passport</groupId>
+            <version>1.0.0</version>
+            <artifactId>com.passport.rpc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>account</groupId>
             <version>1.0.0</version>
             <artifactId>com.account.rpc</artifactId>
@@ -25,6 +30,11 @@
             <groupId>commons</groupId>
             <artifactId>commons-dubbo</artifactId>
             <version>2.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>2.0.1</version>
         </dependency>
     </dependencies>
 

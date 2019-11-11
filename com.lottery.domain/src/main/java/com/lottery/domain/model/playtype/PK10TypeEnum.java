@@ -2,7 +2,7 @@ package com.lottery.domain.model.playtype;
 
 import com.common.util.IGlossary;
 import com.lottery.domain.model.LotteryCategoryEnum;
-import com.lottery.domain.model.PlayOrderSplitUtil;
+import com.lottery.domain.util.PlayOrderSplitUtil;
 import com.lottery.domain.util.*;
 
 import java.util.ArrayList;

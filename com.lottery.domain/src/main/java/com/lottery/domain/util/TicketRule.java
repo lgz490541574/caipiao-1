@@ -11,6 +11,9 @@ public class TicketRule implements Serializable {
         this.wei = wei;
         this.values = values;
     }
+    public TicketRule( String[] values) {
+        this.values = values;
+    }
 
     private String wei;
     private String[] values;

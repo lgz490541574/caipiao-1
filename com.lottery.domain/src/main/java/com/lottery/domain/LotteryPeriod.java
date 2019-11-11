@@ -50,7 +50,7 @@ public class LotteryPeriod extends AbstractBaseEntity {
     private String result;
 
     /**
-     * 开奖结果时间
+     * 开奖时间
      */
     private Date resultDate;
 

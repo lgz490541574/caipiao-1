@@ -42,7 +42,7 @@ public class LotteryPeriodServiceImpl implements LotteryPeriodService {
      * @return
      */
     private String getCollectionName(LotteryCategoryEnum lotteryType,YesOrNoEnum privateLottery,String proxyId) {
-        return "lotteryPeriod_" + lotteryType.name()+(privateLottery==YesOrNoEnum.NO?"":proxyId);
+        return "lotteryPeriod" + lotteryType.name()+(privateLottery==YesOrNoEnum.NO?"":"_"+proxyId);
     }
 
 

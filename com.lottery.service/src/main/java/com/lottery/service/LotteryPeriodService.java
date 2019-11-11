@@ -1,6 +1,5 @@
 package com.lottery.service;
 
-import com.common.util.model.YesOrNoEnum;
 import com.lottery.domain.LotteryPeriod;
 import com.lottery.domain.model.LotteryCategoryEnum;
 
