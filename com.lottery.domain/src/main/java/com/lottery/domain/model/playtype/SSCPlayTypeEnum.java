@@ -2,7 +2,7 @@ package com.lottery.domain.model.playtype;
 
 import com.common.util.IGlossary;
 import com.lottery.domain.model.LotteryCategoryEnum;
-import com.lottery.domain.util.PlayOrderSplitUtil;
+import com.lottery.domain.util.OrderSplitTools;
 import com.lottery.domain.util.*;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                     return false;
                 }
             },(LotteryCategoryEnum lotteryType, String playName, String ...code) -> {
-        return PlayOrderSplitUtil.getSscYxfsTicketInfos(lotteryType, playName, code);
+        return OrderSplitTools.getSscYxfsTicketInfos(lotteryType, playName, code);
     },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -146,7 +146,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.getSscLmTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.getSscLmTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.ZONG_HE.getName(), CodeEnum.SSC_CODE_LMZH.getCodes()),
@@ -209,7 +209,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.getSscLhdTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.getSscLhdTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.WAN_QIAN.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
@@ -254,7 +254,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.getSscCbzTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.getSscCbzTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.BAO_ZI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
@@ -301,7 +301,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
@@ -349,7 +349,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
@@ -399,7 +399,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
@@ -450,7 +450,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
@@ -492,7 +492,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -531,8 +531,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = PlayOrderSplitUtil.getZxHzList(2, codes[0].split(","));
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.getZxHzList(2, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
@@ -568,8 +568,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
             return false;
         }
     },(LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-        List<String> result = PlayOrderSplitUtil.getZxKdList(2, codes[0].split(","));
-        return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+        List<String> result = OrderSplitTools.getZxKdList(2, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
     },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -608,7 +608,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                     return false;
                 }
             },(LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-        return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
     },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -646,8 +646,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                     return false;
                 }
             },(LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-        List<String> result = PlayOrderSplitUtil.getZxHzList(2, codes[0].split(","));
-        return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+        List<String> result = OrderSplitTools.getZxHzList(2, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
     },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
@@ -684,8 +684,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                     return false;
                 }
             },(LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-        List<String> result = PlayOrderSplitUtil.getZxKdList(2, codes[0].split(","));
-        return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+        List<String> result = OrderSplitTools.getZxKdList(2, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
     },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -725,7 +725,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -765,8 +765,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = PlayOrderSplitUtil.getZxHzList(3, codes[0].split(","));
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
@@ -804,8 +804,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = PlayOrderSplitUtil.getZxKdList(3, codes[0].split(","));
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -845,7 +845,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -885,8 +885,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = PlayOrderSplitUtil.getZxHzList(3, codes[0].split(","));
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
@@ -924,8 +924,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = PlayOrderSplitUtil.getZxKdList(3, codes[0].split(","));
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -965,7 +965,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -1005,8 +1005,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = PlayOrderSplitUtil.getZxHzList(3, codes[0].split(","));
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
@@ -1044,8 +1044,8 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = PlayOrderSplitUtil.getZxKdList(3, codes[0].split(","));
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -1084,7 +1084,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
@@ -1125,7 +1125,7 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),

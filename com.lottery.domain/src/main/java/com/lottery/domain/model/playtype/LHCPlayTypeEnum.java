@@ -3,7 +3,7 @@ package com.lottery.domain.model.playtype;
 import com.common.util.DateUtil;
 import com.common.util.IGlossary;
 import com.lottery.domain.model.LotteryCategoryEnum;
-import com.lottery.domain.util.PlayOrderSplitUtil;
+import com.lottery.domain.util.OrderSplitTools;
 import com.lottery.domain.util.*;
 
 import java.util.*;
@@ -37,7 +37,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String ...codes)->{
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playType, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playType, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -73,7 +73,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String ...codes)->{
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playType, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playType, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_LM.getCodes())
@@ -107,7 +107,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -139,7 +139,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -176,7 +176,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_LM.getCodes())
@@ -208,7 +208,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -245,7 +245,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_LM.getCodes())
@@ -278,7 +278,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -315,7 +315,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_LM.getCodes())
@@ -348,7 +348,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -385,7 +385,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_LM.getCodes())
@@ -418,7 +418,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -454,7 +454,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_LM.getCodes())
@@ -487,7 +487,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -524,7 +524,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_LM.getCodes())
@@ -562,7 +562,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_BB.getCodes())
@@ -598,7 +598,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_SX.getCodes())
@@ -636,7 +636,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_SX.getCodes())
@@ -713,8 +713,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 2);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 2);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_SX.getCodes())
@@ -792,8 +792,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 3);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 3);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_SX.getCodes())
@@ -870,8 +870,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 4);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 4);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_SX.getCodes())
@@ -922,8 +922,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 3);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 3);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1003,8 +1003,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 3);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 3);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1055,8 +1055,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 2);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 2);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1146,8 +1146,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 2);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 2);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1201,8 +1201,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 2);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 2);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1241,7 +1241,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_TW.getCodes())
@@ -1313,8 +1313,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 2);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 2);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_WS.getCodes())
@@ -1387,8 +1387,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 3);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 3);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_WS.getCodes())
@@ -1460,8 +1460,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 4);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 4);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_WS.getCodes())
@@ -1510,8 +1510,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 5);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 5);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1560,8 +1560,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 6);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 6);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1610,8 +1610,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 7);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 7);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1660,8 +1660,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 8);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 8);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1710,8 +1710,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 9);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 9);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
@@ -1760,8 +1760,8 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
                 String[] items = codes[0].split(",");
-                List<String> result = PlayOrderSplitUtil.combine(items, 10);
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+                List<String> result = OrderSplitTools.combine(items, 10);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())

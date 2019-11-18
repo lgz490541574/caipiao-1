@@ -7,10 +7,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(exclude = {MongoDataAutoConfiguration.class})
-@EnableTransactionManagement
 @ComponentScan(basePackages = {"com.lottery", "com.common.config"})
-public class MainApplication {
+public class Application {
     public static void main(String[] args) {
-        SpringApplication.run(MainApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 }

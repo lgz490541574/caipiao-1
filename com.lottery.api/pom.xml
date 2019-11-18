@@ -37,14 +37,14 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>lottery-api</finalName>
+        <finalName>app</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.lottery.api.application.ApiApplication</mainClass>
+                    <mainClass>com.lottery.api.application.Application</mainClass>
                     <layout>ZIP</layout>
                 </configuration>
                 <executions>

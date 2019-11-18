@@ -2,7 +2,7 @@ package com.lottery.domain.model.playtype;
 
 import com.common.util.IGlossary;
 import com.lottery.domain.model.LotteryCategoryEnum;
-import com.lottery.domain.util.PlayOrderSplitUtil;
+import com.lottery.domain.util.OrderSplitTools;
 import com.lottery.domain.util.*;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public enum PK10TypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.getPk10DwdTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.getPk10DwdTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GUAN_JUN.getName(), CodeEnum.PK10_CODE_NUMBER.getCodes()),
@@ -84,7 +84,7 @@ public enum PK10TypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.getPk10DwdTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.getPk10DwdTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GUAN_JUN.getName(), CodeEnum.PK10_CODE_NUMBER.getCodes())
@@ -140,7 +140,7 @@ public enum PK10TypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes[0].split(","));
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes[0].split(","));
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GUAN_JUN.getName(), CodeEnum.PK10_CODE_GYHE.getCodes())
@@ -197,7 +197,7 @@ public enum PK10TypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return PlayOrderSplitUtil.getPk10DwdTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.getPk10DwdTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GUAN_JUN.getName(), CodeEnum.PK10_CODE_SMPLH.getCodes()),
@@ -262,7 +262,7 @@ public enum PK10TypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildDuplicateTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDuplicateTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GUAN_JUN.getName(), CodeEnum.PK10_CODE_NUMBER.getCodes()),
@@ -321,7 +321,7 @@ public enum PK10TypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildDuplicateTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDuplicateTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GUAN_JUN.getName(), CodeEnum.PK10_CODE_NUMBER.getCodes()),
@@ -379,7 +379,7 @@ public enum PK10TypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildDuplicateTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDuplicateTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GUAN_JUN.getName(), CodeEnum.PK10_CODE_NUMBER.getCodes()),
@@ -436,7 +436,7 @@ public enum PK10TypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
 
-                return PlayOrderSplitUtil.buildDuplicateTickrtInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildDuplicateTickrtInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(WeiShuEnum.GUAN_JUN.getName(), CodeEnum.PK10_CODE_NUMBER.getCodes()),

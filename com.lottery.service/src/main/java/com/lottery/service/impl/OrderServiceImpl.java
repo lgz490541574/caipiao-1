@@ -13,8 +13,8 @@ import com.lottery.domain.LotteryPeriod;
 import com.lottery.domain.OrderDetail;
 import com.lottery.domain.OrderInfo;
 import com.lottery.domain.TicketInfo;
-import com.lottery.domain.dto.OrderCode;
 import com.lottery.domain.model.LotteryCategoryEnum;
+import com.lottery.domain.util.IPlayType;
 import com.lottery.domain.util.OrderSplitTools;
 import com.lottery.service.LotteryPeriodService;
 import com.lottery.service.OrderDetailService;
@@ -26,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -40,20 +42,21 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
     private LotteryPeriodService lotteryPeriodService;
     @Resource
     private OrderDetailService orderDetailService;
+
     @Override
     protected Class getEntityClass() {
         return OrderInfo.class;
     }
 
 
-    private void createDetail(String orderInfoId, LotteryCategoryEnum lotteryCategory,String playType, String periodCode, TicketInfo[] tickets, Integer times) {
+    private void createDetail(String orderInfoId, LotteryCategoryEnum lotteryCategory, String playType, String periodCode, List<TicketInfo> tickets, Integer times) {
         OrderDetail detail = new OrderDetail();
         detail.setOrderInfoId(orderInfoId);
         detail.setPeriodCode(periodCode);
-        detail.setTickets(Arrays.asList(tickets));
+        detail.setTickets(tickets);
         detail.setLotteryType(lotteryCategory.getValue());
-        detail.setCount(tickets.length);
-        detail.setOrderMoney(BigDecimal.valueOf(tickets.length).multiply(BigDecimal.valueOf(times)));
+        detail.setCount(tickets.size());
+        detail.setOrderMoney(BigDecimal.valueOf(tickets.size()).multiply(BigDecimal.valueOf(times)));
         detail.setPlayType(playType);
         orderDetailService.insert(detail);
     }
@@ -73,16 +76,14 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
      */
     @Override
     @Transactional
-    public BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String periodId, OrderCode[] codes, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop) {
-        List<List<TicketInfo>> listTicket = new ArrayList<>();
-        Map<List<TicketInfo>,String> types=new HashMap<>();
+    public BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodId, String[] codes, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop) {
+        IPlayType play = OrderSplitTools.getPlay(type, playType);
         int count = 0;
-        for (OrderCode dto : codes) {
-            List<TicketInfo> e = OrderSplitTools.doSplit(type, dto.getPlayType(), dto.getLotteryCode());
-            types.put(e,dto.getPlayType());
-            //计算注数
-            count = count + e.size();
-            listTicket.add(e);
+        Map<String, List<TicketInfo>> ticketMap = new HashMap<>();
+        for (String code : codes) {
+            List<TicketInfo> ticketInfos = play.getOrderSplit().doSplit(type, playType, code);
+            count = count + ticketInfos.size();
+            ticketMap.put(code, ticketInfos);
         }
         if (count == 0) {
             throw new BizException("order.error", "下单失败，下单注数必须大于0");
@@ -111,7 +112,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
             throw new BizException("order.error", "网络错误,请稍后再试");
         }
 
-        LotteryPeriod period=lotteryPeriodService.findById(type,proxyId,periodId);
+        LotteryPeriod period = lotteryPeriodService.findById(type, proxyId, periodId);
         OrderInfo order = new OrderInfo();
 
         order.setPin(pin);
@@ -136,8 +137,9 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
 
         //存入订单
         insert(order);
-        for(List<TicketInfo> listItem: listTicket){
-            createDetail(order.getId(),type,types.get(listItem),period.getCode(),listItem.toArray(new TicketInfo[listItem.size()]),times);
+        for (String code : codes) {
+            List<TicketInfo> ticketInfos = ticketMap.get(code);
+            createDetail(order.getId(), type, playType, period.getCode(), ticketInfos, times);
         }
 
         InvertBizDto dto = new InvertBizDto();
@@ -159,7 +161,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
                 return payResult.getData();
             }
         } catch (Exception e) {
-            log.error("order.pay.error",e);
+            log.error("order.pay.error", e);
             throw new BizException("order.error", "网络错误，请稍后再试");
         }
         //账户余额不足

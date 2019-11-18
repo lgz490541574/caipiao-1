@@ -3,7 +3,6 @@ package com.lottery.domain;
 import com.common.annotation.QueryField;
 import com.common.mongo.QueryType;
 import com.common.util.AbstractBaseEntity;
-import com.lottery.domain.dto.OrderCode;
 import lombok.Data;
 import org.springframework.data.annotation.Transient;
 
@@ -18,7 +17,6 @@ public final class OrderInfo extends AbstractBaseEntity {
      * 用户
      */
     private String pin;
-
     /**
      * 追号标记
      */
@@ -36,12 +34,10 @@ public final class OrderInfo extends AbstractBaseEntity {
      * 种类
      */
     private Integer lotteryType;
-
     /**
      * 期号id
      */
     private String periodId;
-
     /**
      * 期号
      */
@@ -53,28 +49,23 @@ public final class OrderInfo extends AbstractBaseEntity {
     /**
      * 预下注号码
      */
-    private OrderCode codes[];
-
+    private String codes[];
     /**
      * 倍投
      */
     private Integer times;
-
     /**
      * 注数
      */
     private Integer count;
-
     /**
      * 是否中奖 1 是 2 否
      */
     private Integer status;
-
     /**
      * 下单金额
      */
     private BigDecimal orderMoney;
-
     /**
      * 中奖金额
      */
@@ -83,7 +74,6 @@ public final class OrderInfo extends AbstractBaseEntity {
      * 盈亏金额
      */
     private BigDecimal profileMoney;
-
     /***
      * 是否结算 1 是 2 否
      */
@@ -97,7 +87,6 @@ public final class OrderInfo extends AbstractBaseEntity {
      * 支付失败次数
      */
     private Integer payErrorTimes;
-
     /**
      * 中奖到账状态 1是 2 否 3到账失败
      */
@@ -106,7 +95,6 @@ public final class OrderInfo extends AbstractBaseEntity {
      * 中奖到账失败次数
      */
     private Integer accountErrorTimes;
-
     /**
      * 是否追号 1是 2 否
      */
@@ -120,8 +108,6 @@ public final class OrderInfo extends AbstractBaseEntity {
      * 倍投状态  1 是  2 否
      */
     private Integer doubleStatus;
-
-
     /**
      * 抽水状态 1是 2 否 3 抽水失败
      */
@@ -130,7 +116,6 @@ public final class OrderInfo extends AbstractBaseEntity {
      * 抽水失败次数 3次过后将不再重试
      */
     private Integer commissionErrorTimes;
-
     /**
      * 小于等于抽水失败次数 3次
      */

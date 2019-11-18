@@ -1,12 +1,17 @@
 package com.lottery.domain.model.playtype;
 
+import com.common.exception.BizException;
 import com.common.util.IGlossary;
+import com.lottery.domain.TicketInfo;
 import com.lottery.domain.model.LotteryCategoryEnum;
-import com.lottery.domain.util.PlayOrderSplitUtil;
+import com.lottery.domain.util.OrderSplitTools;
 import com.lottery.domain.util.*;
 
 import java.util.*;
 
+/**
+ * 11选5
+ */
 public enum SYXWTypeEnum implements IGlossary, IPlayType {
 
     /**
@@ -36,7 +41,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
-                return PlayOrderSplitUtil.getPk10DwdTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.getPk10DwdTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule("第一位", CodeEnum.SYXW_NUMBER.getCodes()),
@@ -75,7 +80,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -110,7 +115,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, codes);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, codes);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -154,7 +159,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes, 2);
+                return analysisGroup(lotteryType, playType, codes, 2);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -198,7 +203,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes, 3);
+                return analysisGroup(lotteryType, playType, codes, 3);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -242,7 +247,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes, 4);
+                return analysisGroup(lotteryType, playType, codes, 4);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -286,7 +291,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes, 5);
+                return analysisGroup(lotteryType, playType, codes, 5);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -330,7 +335,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes, 6);
+                return analysisGroup(lotteryType, playType, codes, 6);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -374,7 +379,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes, 7);
+                return analysisGroup(lotteryType, playType, codes, 7);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -418,7 +423,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes, 8);
+                return analysisGroup(lotteryType, playType, codes, 8);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -452,7 +457,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes);
+                return OrderSplitTools.buildDuplicateTickrtInfos(lotteryType, playType, codes);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -495,7 +500,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes);
+                return OrderSplitTools.buildDuplicateTickrtInfos(lotteryType, playType, codes);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -529,7 +534,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes);
+                return OrderSplitTools.buildDuplicateTickrtInfos(lotteryType, playType, codes);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -572,7 +577,7 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
                 }
             },
             (LotteryCategoryEnum lotteryType, String playType, String... codes) -> {
-                return PlayOrderSplitUtil.analysisGroup(lotteryType, playType, codes);
+                return OrderSplitTools.buildDuplicateTickrtInfos(lotteryType, playType, codes);
             },
             new TicketRule[]{
                     new TicketRule(CodeEnum.SYXW_NUMBER.getCodes()),
@@ -645,5 +650,30 @@ public enum SYXWTypeEnum implements IGlossary, IPlayType {
             sum += item;
         }
         return sum;
+    }
+
+    public static List<TicketInfo> analysisGroup(LotteryCategoryEnum lotteryType, String playType, String[] codes, int size) {
+        List<TicketInfo> ticketInfos = new ArrayList<>();
+        TicketGroup group = new TicketGroup();
+        IPlayType play = OrderSplitTools.getPlay(lotteryType, playType);
+        List<List<String>> lists = group.doAnalysis(codes, size);
+        for (List<String> itemList : lists) {
+            StringBuilder ticket = new StringBuilder();
+            for (String item : itemList) {
+                String[] ticketCode = item.split(",");
+                for (String ticketNumber : ticketCode) {
+                    if (!play.getOrderCheck().checkTicketCode(ticketNumber)) {
+                        throw new BizException("buildOrder.error", "订单非法");
+                    }
+                    ticket.append(ticketCode).append(",");
+                }
+            }
+            TicketInfo TicketInfo = new TicketInfo();
+            TicketInfo.setPrize(false);
+            TicketInfo.setTicketCode(ticket.substring(0, ticket.length() - 1));
+            ticketInfos.add(TicketInfo);
+        }
+
+        return ticketInfos;
     }
 }

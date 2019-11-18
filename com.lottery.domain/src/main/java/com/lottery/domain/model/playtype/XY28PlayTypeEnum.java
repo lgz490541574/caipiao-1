@@ -2,7 +2,7 @@ package com.lottery.domain.model.playtype;
 
 import com.common.util.IGlossary;
 import com.lottery.domain.model.LotteryCategoryEnum;
-import com.lottery.domain.util.PlayOrderSplitUtil;
+import com.lottery.domain.util.OrderSplitTools;
 import com.lottery.domain.util.*;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public enum XY28PlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String[] codes) -> {
                 String[] itemList = codes[0].split(",");
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, itemList);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, itemList);
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.XY28_CODE_NUMBER.getCodes())
@@ -110,7 +110,7 @@ public enum XY28PlayTypeEnum implements IGlossary, IPlayType {
             },
             (LotteryCategoryEnum lotteryType, String playName, String[] codes) -> {
                 String[] itemList = codes[0].split(",");
-                return PlayOrderSplitUtil.buildTicketInfos(lotteryType, playName, itemList);
+                return OrderSplitTools.buildTicketInfos(lotteryType, playName, itemList);
             },
             new TicketRule[]{
                     new TicketRule("", CodeEnum.XY28_CODE_DXDS.getCodes())

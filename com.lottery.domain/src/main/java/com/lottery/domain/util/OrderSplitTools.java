@@ -22,7 +22,7 @@ public class OrderSplitTools {
      * @param codes
      * @return
      */
-    private static List<TicketInfo> getSscCbzTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
+    public static List<TicketInfo> getSscCbzTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
         List<TicketInfo> ticketInfos = new ArrayList<>();
         for (int i = 0; i < codes.length; i++) {
             if ("".equals(codes[i])) {
@@ -54,7 +54,7 @@ public class OrderSplitTools {
      * @param codes
      * @return
      */
-    private static List<TicketInfo> getSscLhdTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
+    public static List<TicketInfo> getSscLhdTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
         List<TicketInfo> ticketInfos = new ArrayList<>();
         for (int i = 0; i < codes.length; i++) {
             if ("".equals(codes[i])) {
@@ -86,7 +86,7 @@ public class OrderSplitTools {
      * @param codes
      * @return
      */
-    private static List<TicketInfo> getSscLmTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
+    public static List<TicketInfo> getSscLmTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
         List<TicketInfo> ticketInfos = new ArrayList<>();
         for (int i = 0; i < codes.length; i++) {
             if ("".equals(codes[i])) {
@@ -116,7 +116,7 @@ public class OrderSplitTools {
         return ticketInfos;
     }
 
-    private static List<TicketInfo> getSscYxfsTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] code) {
+    public static List<TicketInfo> getSscYxfsTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] code) {
         List<TicketInfo> ticketInfos = new ArrayList<>();
         for (int i = 0; i < code.length; i++) {
             if ("".equals(code[i])) {
@@ -155,16 +155,17 @@ public class OrderSplitTools {
             dimValue.add(chList);
         }
         List<String> result = getSortRecursive(dimValue);
-        return buildTicketInfos(lotteryType,playType, result.toArray(new String[result.size()]));
+        return buildTicketInfos(lotteryType, playType, result.toArray(new String[result.size()]));
     }
 
 
     /**
      * 不去重并排序
+     *
      * @param dimValue
      * @return
      */
-    private static List<String> getSortRecursive(List<List<String>> dimValue){
+    private static List<String> getSortRecursive(List<List<String>> dimValue) {
         List<List<String>> recursiveResult = new ArrayList<List<String>>();
         // 递归实现笛卡尔积
         recursive(dimValue, recursiveResult, 0, new ArrayList<String>());
@@ -173,27 +174,27 @@ public class OrderSplitTools {
         for (List<String> list : recursiveResult) {
             String s = "";
             for (String string : list) {
-                if(s.contains(string)){
+                if (s.contains(string)) {
                     continue;
-                }else{
+                } else {
                     s += string + ",";
                 }
             }
-            if(s.split(",").length == dimValue.size()+1){
-                s = s.substring(0,s.length()-1);
+            if (s.split(",").length == dimValue.size() + 1) {
+                s = s.substring(0, s.length() - 1);
 
                 result.add(s);
             }
         }
         List<String> list = new ArrayList<>();
-        for(String s : result){
+        for (String s : result) {
             List<String> eList = Arrays.asList(s.split(","));
             Collections.sort(eList);
             String e = "";
-            for(String str : eList){
-                e += str+",";
+            for (String str : eList) {
+                e += str + ",";
             }
-            list.add(e.substring(0,e.length()-1));
+            list.add(e.substring(0, e.length() - 1));
         }
         Collections.sort(list);
         return list;
@@ -201,12 +202,13 @@ public class OrderSplitTools {
 
     /**
      * pk10 位数拆单方法
+     *
      * @param lotteryType
      * @param playType
      * @param codes
      * @return
      */
-    private static List<TicketInfo> getPk10DwdTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
+    public static List<TicketInfo> getPk10DwdTicketInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
         List<TicketInfo> ticketInfos = new ArrayList<>();
         for (int i = 0; i < codes.length; i++) {
             if ("".equals(codes[i])) {
@@ -285,7 +287,7 @@ public class OrderSplitTools {
         return ticketInfos;
     }
 
-    private static IPlayType getPlay(LotteryCategoryEnum lotteryType, String playType) {
+    public static IPlayType getPlay(LotteryCategoryEnum lotteryType, String playType) {
         IGlossary glossary = GlosseryEnumUtils.getItem(lotteryType.getPlayType(), playType);
         return (IPlayType) glossary;
     }
@@ -293,38 +295,38 @@ public class OrderSplitTools {
 
     /**
      * 根据下注号码生成笛卡尔积组合号码
+     *
      * @param lotteryType
      * @param playType
      * @param codes
      * @return
      */
-    private static List<TicketInfo> buildDiKaErTickrtInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
+    public static List<TicketInfo> buildDiKaErTickrtInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
         List<List<String>> dimValue = new ArrayList<>();
         for (int i = 0; i < codes.length; i++) {
             dimValue.add(Arrays.asList(codes[i].split(",")));
         }
         List<String> result = getMoreRecursive(dimValue);
-        return buildTicketInfos(lotteryType,playType, result.toArray(new String[result.size()]));
+        return buildTicketInfos(lotteryType, playType, result.toArray(new String[result.size()]));
     }
 
 
     /**
      * 根据下注号码生成笛卡尔积并对单注号码去重
+     *
      * @param lotteryType
      * @param playType
      * @param codes
      * @return
      */
-    private static List<TicketInfo> buildDuplicateTickrtInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
+    public static List<TicketInfo> buildDuplicateTickrtInfos(LotteryCategoryEnum lotteryType, String playType, String[] codes) {
         List<List<String>> dimValue = new ArrayList<>();
         for (int i = 0; i < codes.length; i++) {
             dimValue.add(Arrays.asList(codes[i].split(",")));
         }
         List<String> result = getRecursive(dimValue);
-        return buildTicketInfos(lotteryType,playType, result.toArray(new String[result.size()]));
+        return buildTicketInfos(lotteryType, playType, result.toArray(new String[result.size()]));
     }
-
-
 
 
     /**
@@ -391,6 +393,7 @@ public class OrderSplitTools {
             }
         }
     }
+
     public static List<String> sortList(String[] a, int num) {
         List<String> list = new ArrayList<String>();
         List<String> result = combine(a, num);
@@ -406,6 +409,7 @@ public class OrderSplitTools {
         Collections.sort(list);
         return list;
     }
+
     /**
      * 实现的算法
      *
@@ -413,7 +417,7 @@ public class OrderSplitTools {
      * @param num M选N中 N的个数
      * @return
      */
-    private static List<String> combine(String[] a, int num) {
+    public static List<String> combine(String[] a, int num) {
         List<String> list = new ArrayList<String>();
         StringBuffer sb = new StringBuffer();
         String[] b = new String[a.length];
@@ -489,7 +493,7 @@ public class OrderSplitTools {
      * @param codes
      * @return
      */
-    private static List<String> getZxHzList(Integer playNum, String[] codes) {
+    public static List<String> getZxHzList(Integer playNum, String[] codes) {
         String[] arr = CodeEnum.SSC_CODE_NUMBER.getCodes();
         List<String> element = Arrays.asList(arr);
         List<List<String>> dimValue = new ArrayList<>();
@@ -527,7 +531,7 @@ public class OrderSplitTools {
      * @param codes
      * @return
      */
-    private static List<String> getZxKdList(Integer playNum, String[] codes) {
+    public static List<String> getZxKdList(Integer playNum, String[] codes) {
         String[] arr = CodeEnum.SSC_CODE_NUMBER.getCodes();
         List<String> element = Arrays.asList(arr);
         List<List<String>> dimValue = new ArrayList<>();
@@ -558,12 +562,14 @@ public class OrderSplitTools {
 
         return result;
     }
+
     /**
      * 不去重获取笛卡尔积
+     *
      * @param dimValue
      * @return
      */
-    private static List<String> getMoreRecursive(List<List<String>> dimValue){
+    private static List<String> getMoreRecursive(List<List<String>> dimValue) {
         List<List<String>> recursiveResult = new ArrayList<List<String>>();
         // 递归实现笛卡尔积
         recursive(dimValue, recursiveResult, 0, new ArrayList<String>());
@@ -574,12 +580,14 @@ public class OrderSplitTools {
             for (String string : list) {
                 s += string + ",";
             }
-            if(s.split(",").length == dimValue.size()){
-                s = s.substring(0,s.length()-1);
+            if (s.split(",").length == dimValue.size()) {
+                s = s.substring(0, s.length() - 1);
 
                 result.add(s);
             }
         }
         return result;
     }
+
+
 }

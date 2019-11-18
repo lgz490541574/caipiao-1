@@ -1,7 +1,10 @@
 package com.lottery.service;
 
+import com.common.util.model.YesOrNoEnum;
 import com.lottery.domain.LotteryPeriod;
 import com.lottery.domain.model.LotteryCategoryEnum;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface LotteryPeriodService {
 
@@ -24,33 +27,58 @@ public interface LotteryPeriodService {
 
     /**
      * 结算
+     *
      * @param type
      * @param proxyId
      * @param code
      */
-    void doSettle(LotteryCategoryEnum type,  String proxyId, String code);
+    void doSettle(LotteryCategoryEnum type, String proxyId, String code);
 
     /**
      * 派彩
+     *
      * @param type
      * @param proxyId
      * @param code
      */
-    void syncAccount(LotteryCategoryEnum type,  String proxyId, String code);
+    void syncAccount(LotteryCategoryEnum type, String proxyId, String code);
 
     /**
      * 查询彩期
+     *
      * @param category
      * @param proxyId
      * @return
      */
-    LotteryPeriod findById(LotteryCategoryEnum  category,String proxyId,String periodId);
+    LotteryPeriod findById(LotteryCategoryEnum category, String proxyId, String periodId);
 
     /**
      * 查询彩期
+     *
      * @param category
      * @param proxyId
      * @return
      */
-    LotteryPeriod findByCode(LotteryCategoryEnum  category,  String proxyId, String periodId);
+    LotteryPeriod findByCode(LotteryCategoryEnum category, String proxyId, String periodId);
+
+
+    /**
+     * 查询分页
+     *
+     * @param category
+     * @param status
+     * @param proxyId
+     * @return
+     */
+    Page<LotteryPeriod> queryByPage(LotteryCategoryEnum category,YesOrNoEnum status, String proxyId, Pageable pageable);
+
+
+    /**
+     * 获取彩期表名
+     *
+     * @param lotteryType
+     * @param proxyId
+     * @return
+     */
+    String getCollectionName(LotteryCategoryEnum lotteryType,  String proxyId);
 }
