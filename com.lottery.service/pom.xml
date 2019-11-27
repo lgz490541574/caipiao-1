@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>passport</groupId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <artifactId>com.passport.rpc</artifactId>
         </dependency>
         <dependency>

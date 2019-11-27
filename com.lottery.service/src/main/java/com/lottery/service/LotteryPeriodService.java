@@ -57,9 +57,10 @@ public interface LotteryPeriodService {
      *
      * @param category
      * @param proxyId
+     * @param periodCode
      * @return
      */
-    LotteryPeriod findByCode(LotteryCategoryEnum category, String proxyId, String periodId);
+    LotteryPeriod findByCode(LotteryCategoryEnum category, String proxyId, String periodCode);
 
 
     /**

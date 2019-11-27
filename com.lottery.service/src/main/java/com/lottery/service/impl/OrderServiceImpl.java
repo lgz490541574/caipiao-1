@@ -3,7 +3,7 @@ package com.lottery.service.impl;
 import com.account.rpc.AccountRPCService;
 import com.account.rpc.dto.AccountDto;
 import com.account.rpc.dto.BizTypeEnum;
-import com.account.rpc.dto.InvertBizDto;
+import com.account.rpc.dto.InvokeBizDto;
 import com.common.exception.BizException;
 import com.common.mongo.AbstractMongoService;
 import com.common.util.RPCResult;
@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,10 +37,13 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
 
     //现金账户
     static Integer tokenType = 1;
+
     @Reference
     private AccountRPCService accountRPCService;
+
     @Resource
     private LotteryPeriodService lotteryPeriodService;
+
     @Resource
     private OrderDetailService orderDetailService;
 
@@ -67,7 +71,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
      * @param proxyId    代理商
      * @param pin        用户
      * @param type       类型
-     * @param periodId   期号
+     * @param periodCode 期号
      * @param codes      下单号码
      * @param times      部投
      * @param orderMoney 下单金额
@@ -76,7 +80,14 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
      */
     @Override
     @Transactional
-    public BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodId, String[] codes, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop) {
+    public BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodCode, String[] codes, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop) {
+        LotteryPeriod period = lotteryPeriodService.findByCode(type, proxyId, periodCode);
+        if (period == null) {
+            throw new BizException("createOrder.error", "下单失败，期号不存在");
+        }
+        if (new Date().after(period.getEndOrderTime())) {
+            throw new BizException("create.order.periodCode.end.time.error", "下单失败,彩期已截止下注");
+        }
         IPlayType play = OrderSplitTools.getPlay(type, playType);
         int count = 0;
         Map<String, List<TicketInfo>> ticketMap = new HashMap<>();
@@ -112,11 +123,11 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
             throw new BizException("order.error", "网络错误,请稍后再试");
         }
 
-        LotteryPeriod period = lotteryPeriodService.findById(type, proxyId, periodId);
         OrderInfo order = new OrderInfo();
 
         order.setPin(pin);
-        order.setPeriodId(periodId);
+        order.setPeriodId(period.getId());
+        order.setPeriodCode(period.getCode());
         order.setCodes(codes);
         order.setProxyId(proxyId);
         order.setLotteryType(type.getValue());
@@ -142,8 +153,9 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
             createDetail(order.getId(), type, playType, period.getCode(), ticketInfos, times);
         }
 
-        InvertBizDto dto = new InvertBizDto();
+        InvokeBizDto dto = new InvokeBizDto();
         dto.setPin(pin);
+        dto.setTokenType(tokenType);
         dto.setAmount(orderMoney);
         dto.setBizId(order.getId());
         dto.setBizType(BizTypeEnum.caipiao);
@@ -151,7 +163,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         dto.setRemark("pay lottery order");
         RPCResult<BigDecimal> payResult = null;
         try {
-            payResult = accountRPCService.invertBiz(dto);
+            payResult = accountRPCService.invoke(dto);
             if (payResult.getSuccess()) {
                 String orderId = order.getId();
                 order = new OrderInfo();

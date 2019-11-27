@@ -13,6 +13,7 @@
         <module>com.lottery.service</module>
         <module>com.lottery.main</module>
         <module>com.lottery.api</module>
+        <module>com.lottery.proxy</module>
     </modules>
 
     <properties>

@@ -84,10 +84,10 @@ public class LotteryPeriodServiceImpl implements LotteryPeriodService {
     }
 
     @Override
-    public LotteryPeriod findByCode(LotteryCategoryEnum category, String proxyId, String code) {
+    public LotteryPeriod findByCode(LotteryCategoryEnum category, String proxyId, String periodCode) {
         String collectionName = getCollectionName(category, proxyId);
         Query query = new Query();
-        Criteria criteria = Criteria.where("code").is(code);
+        Criteria criteria = Criteria.where("code").is(periodCode);
         query.addCriteria(criteria);
         return secondaryTemplate.findOne(query, LotteryPeriod.class, collectionName);
     }
