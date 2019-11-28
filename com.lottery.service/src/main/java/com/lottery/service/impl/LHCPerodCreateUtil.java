@@ -1,4 +1,4 @@
-package com.lottery.main.job.issure.create;
+package com.lottery.service.impl;
 
 import com.common.exception.ApplicationException;
 import com.common.util.DateUtil;
@@ -28,10 +28,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-//@JobHandler(value = "LHCPerodCreateJobHandler")
 @Slf4j
 @Component
-public class LHCPerodCreateJobHandler extends IJobHandler {
+public class LHCPerodCreateUtil  {
     private static final String LHC_URL = "https://www.kjrq.tv/1/{0}.html";
 
     private static final String hour = "21:20:00";
@@ -48,18 +47,15 @@ public class LHCPerodCreateJobHandler extends IJobHandler {
     @Resource(name = "secondary")
     protected MongoTemplate secondaryTemplate;
 
-    @Override
-    public ReturnT<String> execute(String s) throws Exception {
+    public void build(String month)  {
         String day = DateUtil.formatYYYYMMDD(new Date());
         //判断数据是否已经存在
         PeriodDayLog periodDayLog = periodDayLogService.findByCategoryAndDay(LotteryCategoryEnum.LHC_XG, day);
         if (periodDayLog != null && periodDayLog.getErrorStatus().intValue() == YesOrNoEnum.NO.getValue()) {
-            return SUCCESS;
+            return ;
         }
         LotteryCategoryEnum category = LotteryCategoryEnum.LHC_XG;
-        DateTime month = new DateTime();
-        month.plusMonths(1);
-        String monthStr = DateUtil.formatDateTime(month.toDate(), "yyyy-MM");
+        String monthStr = month;
         List<Date> dates = crawlLhcOpenDate(monthStr);
         Page<LotteryPeriod> lotteryPeriods = lotteryPeriodService.queryByPage(category, null,null, PageRequest.of(0, 1));
         LotteryPeriod period = null;
@@ -83,8 +79,9 @@ public class LHCPerodCreateJobHandler extends IJobHandler {
             code++;
         }
 
-        return null;
     }
+
+
 
     /**
      * 获取六合彩开奖日期

@@ -25,6 +25,7 @@ import java.util.List;
 public class LotteryPeriodServiceImpl implements LotteryPeriodService {
 
 
+
     @Resource
     private OrderService orderService;
     @Resource
@@ -35,6 +36,13 @@ public class LotteryPeriodServiceImpl implements LotteryPeriodService {
     @Resource(name = "secondary")
     protected MongoTemplate secondaryTemplate;
 
+    @Resource
+    private LHCPerodCreateUtil lhcPerodCreateUtil;
+
+    @Override
+    public void buildLHCPeriod(String money) {
+        lhcPerodCreateUtil.build(money);
+    }
 
     /**
      * 获取彩期表名

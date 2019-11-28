@@ -1,13 +1,12 @@
-package com.lottery.main.job.issure.create;
+package com.lottery.main.job;
 
 import com.common.util.DateUtil;
 import com.common.util.RPCResult;
 import com.common.util.model.YesOrNoEnum;
-import com.lottery.domain.LotteryPeriod;
 import com.lottery.domain.PeriodDayLog;
 import com.lottery.domain.model.LotteryCategoryEnum;
 import com.lottery.domain.util.IssureRule;
-import com.lottery.service.LotteryPeriodService;
+import com.lottery.main.job.issure.IssureCreateUtils;
 import com.lottery.service.PeriodDayLogService;
 import com.passport.rpc.ProxyInfoRPCService;
 import com.passport.rpc.dto.ProxyDto;
@@ -15,8 +14,6 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

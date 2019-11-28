@@ -8,20 +8,6 @@ import com.lottery.domain.model.LotteryCategoryEnum;
 import java.math.BigDecimal;
 
 public interface OrderService extends MongoService<OrderInfo> {
-
-//    /**
-//     * 是否追号 1是 2 否
-//     */
-//    private Integer isChase;
-//
-//    /**
-//     * 追号状态 中奖即停 1是 2 否
-//     */
-//    private Integer chaseStatus;
-//    /**
-//     * 倍投状态  1 是  2 否
-//     */
-//    private Integer doubleStatus;
     /**
      * 下单
      *

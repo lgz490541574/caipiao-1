@@ -4,7 +4,8 @@ import com.common.exception.BizException;
 import com.common.util.RPCResult;
 import com.common.util.StringUtils;
 import com.common.web.AbstractController;
-import com.passport.rpc.UserRPCService;
+import com.lottery.service.RPCBeans;
+import com.passport.rpc.dto.ProxyUserDto;
 import com.passport.rpc.dto.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,11 @@ public abstract class AbstractClientController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractClientController.class);
 
     @Resource
-    private Bean userRPCService;
+    private RPCBeans rpcBeans;
 
-    protected UserDTO getUser() {
+    protected ProxyUserDto getUser() {
         String token = getToken();
-        RPCResult<UserDTO> userDTOResult = userRPCService.verificationToken(token);
+        RPCResult<ProxyUserDto> userDTOResult = rpcBeans.getProxyInfoRPCService().verificationToken(token);
         if (userDTOResult.getSuccess()) {
             return userDTOResult.getData();
         }
@@ -47,13 +48,7 @@ public abstract class AbstractClientController extends AbstractController {
     }
 
     protected String getPin() {
-        String token = getToken();
-        RPCResult<UserDTO> userDTOResult = userRPCService.verificationToken(token);
-        if (userDTOResult.getSuccess()) {
-            return userDTOResult.getData().getPin();
-        }
-        LOGGER.error("token.error:" + token);
-        throw new BizException("login.error", "用户登录失效");
+        return getUser().getPin();
     }
 
     protected String getVer() {

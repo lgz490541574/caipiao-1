@@ -1,20 +1,29 @@
 package com.lottery.main.controller;
 
 import com.common.annotation.RoleResource;
+import com.common.util.ContentDto;
+import com.common.util.DateUtil;
 import com.common.util.GlosseryEnumUtils;
 import com.common.util.model.YesOrNoEnum;
+import com.lottery.domain.LotteryPeriod;
+import com.lottery.domain.PeriodDayLog;
 import com.lottery.domain.model.LotteryCategoryEnum;
 import com.lottery.main.AbstractClientController;
 import com.lottery.main.controller.dto.LotteryPeriodDto;
 import com.lottery.service.LotteryPeriodService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -27,6 +36,7 @@ public class PeriodController extends AbstractClientController {
     @Resource
     private LotteryPeriodService lotteryPeriodService;
 
+
     /**
      * 列表查询
      *
@@ -37,13 +47,20 @@ public class PeriodController extends AbstractClientController {
     @RequestMapping("/period/list")
     public Map<String, Object> list(@RequestBody LotteryPeriodDto dto) {
         return buildMessage(() -> {
-            LotteryCategoryEnum category=GlosseryEnumUtils.getItem(LotteryCategoryEnum.class,dto.getLotteryType());
-            YesOrNoEnum status=GlosseryEnumUtils.getItem(YesOrNoEnum.class,dto.getStatus());
-            return lotteryPeriodService.queryByPage(category,status,dto.getProxyId(),dto.getPageinfo().getPage());
+            LotteryCategoryEnum category = GlosseryEnumUtils.getItem(LotteryCategoryEnum.class, dto.getLotteryType());
+            YesOrNoEnum status = GlosseryEnumUtils.getItem(YesOrNoEnum.class, dto.getStatus());
+            return lotteryPeriodService.queryByPage(category, status, dto.getProxyId(), dto.getPageinfo().getPage());
         });
     }
 
-
+    @RoleResource(resource = "lottery")
+    @RequestMapping("/period/buildLHC")
+    public Map<String, Object> buildLHC(ContentDto dto) {
+        return buildMessage(() -> {
+            lotteryPeriodService.buildLHCPeriod(dto.getContent());
+            return null;
+        });
+    }
 
 //
 //    /**

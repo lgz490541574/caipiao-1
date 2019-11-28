@@ -21,4 +21,7 @@ public class PeriodDayLogServiceImpl extends AbstractMongoService<PeriodDayLog> 
         query.setDay(day);
         return findByOne(query);
     }
+
+
+
 }

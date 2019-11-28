@@ -1,4 +1,4 @@
-package com.lottery.main.job.issure.create;
+package com.lottery.main.job.issure;
 
 import com.common.util.DateUtil;
 import com.common.util.model.YesOrNoEnum;

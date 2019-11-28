@@ -16,6 +16,12 @@ public interface LotteryPeriodService {
     void insert(LotteryPeriod period);
 
     /**
+     * 生成彩期
+     * @param money
+     */
+    void buildLHCPeriod(String money);
+
+    /**
      * 开奖
      *
      * @param type
