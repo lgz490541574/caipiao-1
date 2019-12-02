@@ -1,4 +1,4 @@
-package com.lottery.api.controller;
+package com.lottery.api.controller.web;
 
 import com.lottery.api.AbstractClientController;
 import com.lottery.api.controller.dto.OrderDto;
@@ -17,11 +17,12 @@ import java.util.Map;
 public class OrderController extends AbstractClientController {
     @Resource
     private OrderService orderService;
+
     @RequestMapping("order/create")
     public Map<String, Object> create(@RequestBody OrderDto dto) {
         return buildMessage(() -> {
             UserDTO userDto = getUserDto();
-            return orderService.createOrder(userDto.getProxyId(), userDto.getPin(), dto.getType(), dto.getPlayType(), dto.getPeriodCode(), dto.getCodes(), dto.getTimes(), dto.getOrderMoney(), dto.getChaseMark(), dto.getPrizeStop());
+            return orderService.createOrder(userDto.getProxyId(), userDto.getPin(), dto.getType(), dto.getPlayType(), dto.getPeriodCode(), dto.getCodeList(), dto.getTimes(), dto.getOrderMoney(), dto.getChaseMark(), dto.getPrizeStop());
         });
     }
 

@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Transient;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 订单详情
@@ -47,9 +48,9 @@ public final class OrderInfo extends AbstractBaseEntity {
      */
     private String peroidResult;
     /**
-     * 预下注号码
+     *下注号码
      */
-    private String codes[];
+    private List<String[]> codeList;
     /**
      * 倍投
      */

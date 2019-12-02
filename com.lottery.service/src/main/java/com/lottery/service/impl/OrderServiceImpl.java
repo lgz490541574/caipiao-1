@@ -72,7 +72,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
      * @param pin        用户
      * @param type       类型
      * @param periodCode 期号
-     * @param codes      下单号码
+     * @param codeList   下单号码
      * @param times      部投
      * @param orderMoney 下单金额
      * @param chaseMark  追号标记 为空时则没有追号
@@ -80,7 +80,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
      */
     @Override
     @Transactional
-    public BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodCode, String[] codes, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop) {
+    public BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodCode, List<String[]> codeList, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop) {
         LotteryPeriod period = lotteryPeriodService.findByCode(type, proxyId, periodCode);
         if (period == null) {
             throw new BizException("createOrder.error", "下单失败，期号不存在");
@@ -90,16 +90,17 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         }
         IPlayType play = OrderSplitTools.getPlay(type, playType);
         int count = 0;
-        Map<String, List<TicketInfo>> ticketMap = new HashMap<>();
-        for (String code : codes) {
-            List<TicketInfo> ticketInfos = play.getOrderSplit().doSplit(type, playType, code);
+        Map<String[], List<TicketInfo>> ordersMap = new HashMap<>();
+
+        for (String[] codes : codeList) {
+            List<TicketInfo> ticketInfos = play.getOrderSplit().doSplit(type, playType, codes);
+            ordersMap.put(codes, ticketInfos);
             count = count + ticketInfos.size();
-            ticketMap.put(code, ticketInfos);
         }
+        //折单
         if (count == 0) {
             throw new BizException("order.error", "下单失败，下单注数必须大于0");
         }
-
         if (StringUtils.isNotBlank(chaseMark)) {
             if (prizeStop == null) {
                 throw new BizException("order.error", "下单失败，追号时参数 prizeStop 不能为空");
@@ -128,7 +129,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         order.setPin(pin);
         order.setPeriodId(period.getId());
         order.setPeriodCode(period.getCode());
-        order.setCodes(codes);
+        order.setCodeList(codeList);
         order.setProxyId(proxyId);
         order.setLotteryType(type.getValue());
         order.setOrderMoney(orderMoney);
@@ -148,19 +149,19 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
 
         //存入订单
         insert(order);
-        for (String code : codes) {
-            List<TicketInfo> ticketInfos = ticketMap.get(code);
-            createDetail(order.getId(), type, playType, period.getCode(), ticketInfos, times);
+        for (String[] codes : codeList) {
+            createDetail(order.getId(), type, playType, period.getCode(), ordersMap.get(codes), times);
         }
-
         InvokeBizDto dto = new InvokeBizDto();
         dto.setPin(pin);
         dto.setTokenType(tokenType);
         dto.setAmount(orderMoney);
         dto.setBizId(order.getId());
-        dto.setBizType(BizTypeEnum.caipiao);
-        dto.setOperator(pin);
-        dto.setRemark("pay lottery order");
+        dto.setBizType(BizTypeEnum.lottery);
+        dto.setSubBiz("下单");
+
+        dto.setOperator("system");
+        dto.setRemark("彩票下单");
         RPCResult<BigDecimal> payResult = null;
         try {
             payResult = accountRPCService.invoke(dto);

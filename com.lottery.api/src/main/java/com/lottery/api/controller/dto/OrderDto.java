@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class OrderDto implements Serializable {
@@ -25,7 +26,7 @@ public class OrderDto implements Serializable {
     /**
      * 下单号码
      */
-    private String[] codes;
+    private List<String[]> codeList;
     /**
      * 部投
      */

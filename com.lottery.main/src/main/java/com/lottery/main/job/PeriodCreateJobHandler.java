@@ -26,7 +26,6 @@ import java.util.List;
 @Component
 public class PeriodCreateJobHandler extends IJobHandler {
 
-
     @Resource
     private ProxyInfoRPCService proxyInfoRPCService;
     @Resource

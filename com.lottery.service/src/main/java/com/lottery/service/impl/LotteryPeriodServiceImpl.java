@@ -81,6 +81,14 @@ public class LotteryPeriodServiceImpl implements LotteryPeriodService {
     public void doSettle(LotteryCategoryEnum type, String proxyId, String code) {
     }
 
+    @Override
+    public LotteryPeriod findLast(LotteryCategoryEnum category, String proxyId) {
+        Page<LotteryPeriod> lotteryPeriods = queryByPage(category, null, proxyId, PageRequest.of(0, 1));
+        if(lotteryPeriods.hasNext()){
+            return lotteryPeriods.getContent().get(0);
+        }
+        return null;
+    }
 
     @Override
     public LotteryPeriod findById(LotteryCategoryEnum category, String proxyId, String periodId) {

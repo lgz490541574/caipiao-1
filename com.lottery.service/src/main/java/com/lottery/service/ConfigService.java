@@ -2,6 +2,9 @@ package com.lottery.service;
 
 import com.common.mongo.MongoService;
 import com.lottery.domain.Config;
+import com.lottery.domain.model.LotteryCategoryEnum;
+
+import java.util.Map;
 
 /**
  * 玩法设置
@@ -36,5 +39,14 @@ public interface ConfigService extends MongoService<Config> {
      * @param config
      */
   void saveOrUpdate(Config config);
+
+  /**
+   * 获取玩法详情
+   * @param proxyId
+   * @param lottery
+   * @param playType
+   * @return
+   */
+  public Map<String, Object> getPlayTypeDetail(String proxyId, LotteryCategoryEnum lottery,String playType);
 
 }

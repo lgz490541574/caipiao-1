@@ -6,6 +6,7 @@ import com.lottery.domain.OrderInfo;
 import com.lottery.domain.model.LotteryCategoryEnum;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface OrderService extends MongoService<OrderInfo> {
     /**
@@ -22,5 +23,5 @@ public interface OrderService extends MongoService<OrderInfo> {
      * @param chaseMark    追号标记
      * @param prizeStop    中奖即停
      */
-    BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type,String playType, String periodId, String[] codes, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop);
+    BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodId, List<String[]> codes, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop);
 }
