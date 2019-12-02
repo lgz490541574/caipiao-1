@@ -31,9 +31,6 @@ public abstract class AbstractClientController extends AbstractController {
     @Resource
     private RPCBeans rpcBeans;
 
-
-    @Resource
-
     private Map<String, ProxyDto> proxyMap = new HashMap<>();
 
     protected UserDTO getUserDto() {
