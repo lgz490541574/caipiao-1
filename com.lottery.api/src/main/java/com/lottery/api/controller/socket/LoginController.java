@@ -1,4 +1,4 @@
-package com.lottery.api.controller.web;
+package com.lottery.api.controller.socket;
 
 import com.common.util.ContentDto;
 import com.lottery.api.AbstractSocketController;
@@ -11,7 +11,7 @@ import java.util.Map;
 @Controller
 public class LoginController extends AbstractSocketController {
     @MessageMapping("/login/in")
-    @SendTo("/topic/login/in")
+    @SendTo("/topic/user/account")
     public Map<String, Object> in(ContentDto dto) {
         return buildMessage(() -> {
             return null;
