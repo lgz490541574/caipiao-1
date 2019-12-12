@@ -48,14 +48,16 @@ public class PeriodController extends AbstractClientController {
     public Map<String, Object> list(@RequestBody LotteryPeriodDto dto) {
         return buildMessage(() -> {
             LotteryCategoryEnum category = GlosseryEnumUtils.getItem(LotteryCategoryEnum.class, dto.getLotteryType());
-            YesOrNoEnum status = GlosseryEnumUtils.getItem(YesOrNoEnum.class, dto.getStatus());
-            return lotteryPeriodService.queryByPage(category, status, dto.getProxyId(), dto.getPageinfo().getPage());
+            LotteryPeriod period = new LotteryPeriod();
+            period.setLotteryType(category.getValue());
+            period.setProxyId(dto.getProxyId());
+            return lotteryPeriodService.queryByPage(period, dto.getPageinfo().getPage());
         });
     }
 
     @RoleResource(resource = "lottery")
     @RequestMapping("/period/buildLHC")
-    public Map<String, Object> buildLHC(ContentDto dto) {
+    public Map<String, Object> buildLHC(@RequestBody ContentDto dto) {
         return buildMessage(() -> {
             lotteryPeriodService.buildLHCPeriod(dto.getContent());
             return null;
@@ -133,7 +135,7 @@ public class PeriodController extends AbstractClientController {
 //            IPeriodInfoService periodInforService = findPeriodInforService(type);
 //            AbstractPeriod entity =castAbstractPeriod(periodInforService);
 //            BeanCoper.copyProperties(entity, info);
-//            entity.setStatus(YesOrNoEnum.NO.getValue());
+//            entity.setOpenStatus(YesOrNoEnum.NO.getValue());
 //            entity.setSettleStatus(YesOrNoEnum.NO.getValue());
 //            periodInforService.settlePeriodByHand(entity);
 //            return null;
@@ -154,7 +156,7 @@ public class PeriodController extends AbstractClientController {
 //            IPeriodInfoService periodInforService = findPeriodInforService(type);
 //            AbstractPeriod entity =castAbstractPeriod(periodInforService);
 //            BeanCoper.copyProperties(entity, info);
-//            entity.setStatus(YesOrNoEnum.YES.getValue());
+//            entity.setOpenStatus(YesOrNoEnum.YES.getValue());
 //            entity.setSettleStatus(YesOrNoEnum.NO.getValue());
 //            periodInforService.executePeriodByHand(entity);
 //            return null;
@@ -207,7 +209,7 @@ public class PeriodController extends AbstractClientController {
 //            IPeriodInfoService periodInforService = findPeriodInforService(type);
 //            LhcPeriodInfo period = new LhcPeriodInfo();
 //            period.setGameType(type.getValue());
-//            period.setStatus(YesOrNoEnum.NO.getValue());
+//            period.setOpenStatus(YesOrNoEnum.NO.getValue());
 //            List<LhcPeriodInfo> query = periodInforService.query(period);
 //            String date = info.getDate();
 //            if(date.length()!=8){

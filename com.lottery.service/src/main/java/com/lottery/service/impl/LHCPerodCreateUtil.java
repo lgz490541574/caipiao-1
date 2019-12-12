@@ -8,9 +8,6 @@ import com.lottery.domain.PeriodDayLog;
 import com.lottery.domain.model.LotteryCategoryEnum;
 import com.lottery.service.LotteryPeriodService;
 import com.lottery.service.PeriodDayLogService;
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.handler.IJobHandler;
-import com.xxl.job.core.handler.annotation.JobHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
@@ -30,7 +27,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class LHCPerodCreateUtil  {
+public class LHCPerodCreateUtil {
     private static final String LHC_URL = "https://www.kjrq.tv/1/{0}.html";
 
     private static final String hour = "21:20:00";
@@ -47,18 +44,20 @@ public class LHCPerodCreateUtil  {
     @Resource(name = "secondary")
     protected MongoTemplate secondaryTemplate;
 
-    public void build(String month)  {
+    public void build(String month) {
         String day = DateUtil.formatYYYYMMDD(new Date());
         //判断数据是否已经存在
         PeriodDayLog periodDayLog = periodDayLogService.findByCategoryAndDay(LotteryCategoryEnum.LHC_XG, day);
         if (periodDayLog != null && periodDayLog.getErrorStatus().intValue() == YesOrNoEnum.NO.getValue()) {
-            return ;
+            return;
         }
         LotteryCategoryEnum category = LotteryCategoryEnum.LHC_XG;
         String monthStr = month;
         List<Date> dates = crawlLhcOpenDate(monthStr);
-        Page<LotteryPeriod> lotteryPeriods = lotteryPeriodService.queryByPage(category, null,null, PageRequest.of(0, 1));
-        LotteryPeriod period = null;
+        LotteryPeriod period = new LotteryPeriod();
+        period.setLotteryType(category.getValue());
+        Page<LotteryPeriod> lotteryPeriods = lotteryPeriodService.queryByPage(period, PageRequest.of(0, 1));
+
         Integer code = 0;
         if (lotteryPeriods.getContent() == null || lotteryPeriods.getContent().size() == 0) {
             code = 1;
@@ -69,9 +68,14 @@ public class LHCPerodCreateUtil  {
             String collectionName = lotteryPeriodService.getCollectionName(category, null);
             period = new LotteryPeriod();
             period.setCode(String.valueOf(code));
-            period.setEndOrderTime(date);
+            String dayItem = DateUtil.formatDateTime(date, "yyyy-MM-dd");
+            DateTime openTime = new DateTime(DateUtil.parse(dayItem,"yyyy-MM-dd"));
+            openTime = openTime.plusHours(21).plusMinutes(30);
+            period.setEndOrderTime(openTime.plusMinutes(-30).toDate());
+            period.setResultDate(openTime.toDate());
+            period.setResultDateStr(DateUtil.formatDateTime(openTime.toDate(), "yyyy-MM-dd HH:mm:ss"));
             period.setLotteryType(category.getValue());
-            period.setStatus(YesOrNoEnum.NO.getValue());
+            period.setOpenStatus(YesOrNoEnum.NO.getValue());
             period.setResultStatus(YesOrNoEnum.NO.getValue());
             period.setPrivateLottery(YesOrNoEnum.NO.getValue());
             period.setSettleStatus(YesOrNoEnum.NO.getValue());
@@ -80,7 +84,6 @@ public class LHCPerodCreateUtil  {
         }
 
     }
-
 
 
     /**

@@ -35,6 +35,12 @@ public final class OrderInfo extends AbstractBaseEntity {
      * 种类
      */
     private Integer lotteryType;
+
+    /**
+     * 玩法类型
+     */
+    private String playType;
+
     /**
      * 期号id
      */

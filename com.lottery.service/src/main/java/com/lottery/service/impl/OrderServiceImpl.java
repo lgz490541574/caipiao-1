@@ -65,6 +65,12 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         orderDetailService.insert(detail);
     }
 
+
+    @Override
+    public void doSettle(List<OrderInfo> orderList, String result) {
+
+    }
+
     /**
      * 下单
      *
@@ -74,13 +80,12 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
      * @param periodCode 期号
      * @param codeList   下单号码
      * @param times      部投
-     * @param orderMoney 下单金额
      * @param chaseMark  追号标记 为空时则没有追号
      * @param prizeStop  中奖即停 追号标记不为空时则 该参数不能为空
      */
     @Override
     @Transactional
-    public BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodCode, List<String[]> codeList, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop) {
+    public BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodCode, List<String[]> codeList, Integer times, String chaseMark, YesOrNoEnum prizeStop) {
         LotteryPeriod period = lotteryPeriodService.findByCode(type, proxyId, periodCode);
         if (period == null) {
             throw new BizException("createOrder.error", "下单失败，期号不存在");
@@ -94,6 +99,9 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
 
         for (String[] codes : codeList) {
             List<TicketInfo> ticketInfos = play.getOrderSplit().doSplit(type, playType, codes);
+            for (TicketInfo info : ticketInfos) {
+                info.setTimes(times);
+            }
             ordersMap.put(codes, ticketInfos);
             count = count + ticketInfos.size();
         }
@@ -108,10 +116,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         }
 
         //单注金额为1元 总金额必须等于下单金额(money)
-        BigDecimal totalMoney = BigDecimal.ONE.multiply(BigDecimal.valueOf(count));
-        if (!totalMoney.equals(orderMoney)) {
-            throw new BizException("order.error", "下单失败，下单金额错误");
-        }
+        BigDecimal orderMoney = BigDecimal.ONE.multiply(BigDecimal.valueOf(count)).multiply(BigDecimal.valueOf(times));
 
         RPCResult<AccountDto> accountResult = accountRPCService.findAccount(pin, tokenType);
         if (accountResult.getSuccess()) {
@@ -124,6 +129,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
             throw new BizException("order.error", "网络错误,请稍后再试");
         }
 
+
         OrderInfo order = new OrderInfo();
 
         order.setPin(pin);
@@ -132,6 +138,7 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         order.setCodeList(codeList);
         order.setProxyId(proxyId);
         order.setLotteryType(type.getValue());
+        order.setPlayType(playType);
         order.setOrderMoney(orderMoney);
         order.setPayStatus(YesOrNoEnum.NO.getValue());
         //追号参数
@@ -159,7 +166,6 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         dto.setBizId(order.getId());
         dto.setBizType(BizTypeEnum.lottery);
         dto.setSubBiz("下单");
-
         dto.setOperator("system");
         dto.setRemark("彩票下单");
         RPCResult<BigDecimal> payResult = null;

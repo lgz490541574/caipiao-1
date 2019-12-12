@@ -32,10 +32,6 @@ public class OrderDto implements Serializable {
      */
     private Integer times;
     /**
-     * 下单金额
-     */
-    private BigDecimal orderMoney;
-    /**
      * 追号标记
      */
     private String chaseMark;

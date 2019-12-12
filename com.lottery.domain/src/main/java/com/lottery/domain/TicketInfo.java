@@ -19,6 +19,11 @@ public  class TicketInfo implements Serializable {
     private Boolean prize;
 
     /**
+     * 倍投
+     */
+    private Integer times;
+
+    /**
      * 位数
      */
     private String weiShu;

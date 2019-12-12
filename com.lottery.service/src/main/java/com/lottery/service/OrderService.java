@@ -12,16 +12,24 @@ public interface OrderService extends MongoService<OrderInfo> {
     /**
      * 下单
      *
-     * @param proxyId  代理商
-     * @param pin      用户
-     * @param type     类型
-     * @param playType 玩法
-     * @param periodId 期号
-     * @param codes    下单号码
-     * @param times    部投
-     * @param orderMoney    下单金额
-     * @param chaseMark    追号标记
-     * @param prizeStop    中奖即停
+     * @param proxyId   代理商
+     * @param pin       用户
+     * @param type      类型
+     * @param playType  玩法
+     * @param periodId  期号
+     * @param codes     下单号码
+     * @param times     部投
+     * @param chaseMark 追号标记
+     * @param prizeStop 中奖即停
      */
-    BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodId, List<String[]> codes, Integer times, BigDecimal orderMoney, String chaseMark, YesOrNoEnum prizeStop);
+    BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodId, List<String[]> codes, Integer times, String chaseMark, YesOrNoEnum prizeStop);
+
+
+    /**
+     * 结算
+     *
+     * @param orderList
+     * @param result
+     */
+    void doSettle(List<OrderInfo> orderList, String result);
 }

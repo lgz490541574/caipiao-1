@@ -16,10 +16,9 @@ import java.util.Date;
  * 彩期实体
  */
 @Data
-@Document(collection = "clientUserInfo")
 @CompoundIndexes(
         {
-                @CompoundIndex(name = "uniqueIndex", def = "{'lotteryType':1,'code':1}", unique = true)
+                @CompoundIndex(name = "uniqueIndex", def = "{'code':1}", unique = true)
         })
 public class LotteryPeriod extends AbstractBaseEntity {
 
@@ -32,11 +31,13 @@ public class LotteryPeriod extends AbstractBaseEntity {
     /**
      * 是否私彩
      */
+    @Transient
     private Integer privateLottery;
 
     /**
      * 代理商标识
      */
+    @Transient
     private String proxyId;
 
     /**
@@ -54,10 +55,12 @@ public class LotteryPeriod extends AbstractBaseEntity {
      */
     private Date resultDate;
 
+    private String resultDateStr;
+
     /**
      * 是否开奖 1 开奖 2否
      */
-    private Integer status;
+    private Integer openStatus;
 
     /**
      * 是否结算
@@ -67,6 +70,11 @@ public class LotteryPeriod extends AbstractBaseEntity {
      * 下注截止时间
      */
     private Date endOrderTime;
+
+    /**
+     * 派彩状态
+     */
+    private Integer dispatchStatus;
 
 
     /**

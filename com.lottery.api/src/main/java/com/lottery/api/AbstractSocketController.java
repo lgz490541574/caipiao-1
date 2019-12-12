@@ -12,6 +12,7 @@ import com.passport.rpc.dto.ProxyDto;
 import com.passport.rpc.dto.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
@@ -26,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractSocketController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSocketController.class);
 
+    @Resource
+    protected SimpMessagingTemplate simpMessagingTemplate;
 
     @Resource
     protected RPCBeans rpcBeans;

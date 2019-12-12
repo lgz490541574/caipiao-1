@@ -20,7 +20,7 @@ public interface LotteryConfigService extends MongoService<LotteryConfig> {
     List<LotteryConfig> findProxyAllConfigs(String proxyId);
 
 
-//    void updateStatusByProxyId(String proxyId, Integer status);
+//    void updateStatusByProxyId(String proxyId, Integer openStatus);
 
     /**
      * 根据代理商id和彩种类型查找

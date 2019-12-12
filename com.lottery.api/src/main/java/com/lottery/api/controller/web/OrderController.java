@@ -22,7 +22,7 @@ public class OrderController extends AbstractClientController {
     public Map<String, Object> create(@RequestBody OrderDto dto) {
         return buildMessage(() -> {
             UserDTO userDto = getUserDto();
-            return orderService.createOrder(userDto.getProxyId(), userDto.getPin(), dto.getType(), dto.getPlayType(), dto.getPeriodCode(), dto.getCodeList(), dto.getTimes(), dto.getOrderMoney(), dto.getChaseMark(), dto.getPrizeStop());
+            return orderService.createOrder(userDto.getProxyId(), userDto.getPin(), dto.getType(), dto.getPlayType(), dto.getPeriodCode(), dto.getCodeList(), dto.getTimes(), dto.getChaseMark(), dto.getPrizeStop());
         });
     }
 

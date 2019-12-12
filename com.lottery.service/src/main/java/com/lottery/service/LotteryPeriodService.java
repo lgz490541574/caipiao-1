@@ -1,11 +1,15 @@
 package com.lottery.service;
 
 import com.common.util.model.YesOrNoEnum;
+import com.lottery.domain.Config;
 import com.lottery.domain.LotteryPeriod;
+import com.lottery.domain.OrderInfo;
 import com.lottery.domain.model.LotteryCategoryEnum;
+import com.lottery.service.dto.PeriodResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Date;
 import java.util.List;
 
 public interface LotteryPeriodService {
@@ -17,11 +21,21 @@ public interface LotteryPeriodService {
      */
     void insert(LotteryPeriod period);
 
+    void save(LotteryPeriod period);
+
+    /**
+     *
+     * @param category
+     * @param proxyId
+     * @param resultDate
+     * @param result
+     */
+    boolean saveByResultDateTime(LotteryCategoryEnum category,String proxyId,String resultDate,String result);
     /**
      * 生成彩期
-     * @param money
+     * @param month
      */
-    void buildLHCPeriod(String money);
+    void buildLHCPeriod(String month);
 
     /**
      * 开奖
@@ -31,7 +45,8 @@ public interface LotteryPeriodService {
      * @param code
      * @param result
      */
-    void drawPeriod(LotteryCategoryEnum type, String proxyId, String code, String result);
+    boolean drawPeriod(LotteryCategoryEnum type, String proxyId, String code, String result);
+
 
     /**
      * 结算
@@ -78,16 +93,13 @@ public interface LotteryPeriodService {
      */
     LotteryPeriod findByCode(LotteryCategoryEnum category, String proxyId, String periodCode);
 
-
     /**
-     * 查询分页
      *
-     * @param category
-     * @param status
-     * @param proxyId
+     * @param period
+     * @param pageable
      * @return
      */
-    Page<LotteryPeriod> queryByPage(LotteryCategoryEnum category,YesOrNoEnum status, String proxyId, Pageable pageable);
+    Page<LotteryPeriod> queryByPage(LotteryPeriod period, Pageable pageable);
 
 
     /**
@@ -98,4 +110,14 @@ public interface LotteryPeriodService {
      * @return
      */
     String getCollectionName(LotteryCategoryEnum lotteryType,  String proxyId);
+
+
+    /**
+     * 计算开奖结果
+     * @param lotteryType
+     * @param orderList
+     * @param configs
+     * @return
+     */
+    List<PeriodResult> caculateResult(LotteryCategoryEnum lotteryType, List<OrderInfo> orderList, List<Config> configs);
 }
