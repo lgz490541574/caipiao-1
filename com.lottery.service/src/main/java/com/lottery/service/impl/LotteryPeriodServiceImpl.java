@@ -635,7 +635,7 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         String collectionName = getCollectionName(category, proxyId);
         Query query = new Query();
         MongoTemplate template = secondaryTemplate;
-        if (StringUtils.isBlank(period.getId())) {
+        if (StringUtils.isNotBlank(period.getId())) {
             Criteria criteria = Criteria.where("id").is(period.getId());
             query.addCriteria(criteria);
         }

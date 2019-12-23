@@ -45,23 +45,23 @@ public class LotteryResultUtils {
     }
     private String lotteryOpenKey = "lottery.period.open.{0}.type.{1}.proxy.{2}";
     @Resource
-    private StringRedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     @Autowired(required = false)
     private RocketMQTemplate rocketMQTemplate;
 
     private void pushResultToMq(LotteryCategoryEnum category, String proxyId, String code, String result) {
         try {
-            redisTemplate.setEnableTransactionSupport(true);
-            redisTemplate.multi();
+            stringRedisTemplate.setEnableTransactionSupport(true);
+            stringRedisTemplate.multi();
             if (StringUtils.isBlank(proxyId)) {
                 proxyId = "";
             }
             String key = MessageFormat.format(lotteryOpenKey, category.getValue(), proxyId);
-            redisTemplate.opsForValue().increment(key, 1);
-            redisTemplate.expire(key, 1, TimeUnit.MINUTES);
-            redisTemplate.exec();
-            Long increment = redisTemplate.opsForValue().increment(key, 1);
+            stringRedisTemplate.opsForValue().increment(key, 1);
+            stringRedisTemplate.expire(key, 1, TimeUnit.MINUTES);
+            stringRedisTemplate.exec();
+            Long increment = stringRedisTemplate.opsForValue().increment(key, 1);
             if (increment == 2) {
                 JSONObject item=new JSONObject();
                 item.put("type",category.getValue());
@@ -72,7 +72,7 @@ public class LotteryResultUtils {
             }
         } catch (Exception e) {
             log.error("LotteryResultUtils.pushResultTomq", e);
-            redisTemplate.discard();
+            stringRedisTemplate.discard();
         }
     }
 
