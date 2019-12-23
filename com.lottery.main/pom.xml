@@ -48,7 +48,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.account.main.application.MainApplication</mainClass>
+                    <mainClass>com.lottery.main.application.Application</mainClass>
                     <layout>ZIP</layout>
                 </configuration>
                 <executions>
