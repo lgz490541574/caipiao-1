@@ -4,6 +4,7 @@ import com.common.exception.ApplicationException;
 import com.common.util.GlosseryEnumUtils;
 import com.common.util.IGlossary;
 import com.common.util.StringUtils;
+import com.common.util.model.NameValue;
 import com.common.util.model.SexEnum;
 import com.common.util.model.YesOrNoEnum;
 import com.lottery.domain.model.LotteryCategoryEnum;
@@ -33,36 +34,28 @@ public class GlobalController extends AbstractClientController {
 
     @RequestMapping(value = "/global/type/{type}")
     @ResponseBody
-    public Map<String, Object> buildGlossery(@PathVariable("type") String type) {
-        return buildMessage(() -> {
-            List<Map<String, Object>> keyValues = new ArrayList<Map<String, Object>>();
-            if (StringUtils.isBlank(type)) {
-                throw new ApplicationException("buildGlossery Error unKnow type");
-            }
-            if ("category".equalsIgnoreCase(type)) {
-                LotteryCategoryEnum[] types = LotteryCategoryEnum.values();
-                List<LotteryCategoryEnum> typeList = new ArrayList<>();
-                for (LotteryCategoryEnum item : types) {
-                    if (item.getParent() != null) {
-                        typeList.add(item);
-                        HashMap<String, Object> itemValue = new HashMap<>();
-                        itemValue.put("value", item.getValue());
-                        itemValue.put("name", item.getName());
-                        keyValues.add(itemValue);
-                    }
+    public List<NameValue> buildGlossery(@PathVariable("type") String type) {
+        List<NameValue> keyValues = new ArrayList<>();
+        if (StringUtils.isBlank(type)) {
+            throw new ApplicationException("buildGlossery Error unKnow type");
+        }
+        if ("category".equalsIgnoreCase(type)) {
+            LotteryCategoryEnum[] types = LotteryCategoryEnum.values();
+            List<LotteryCategoryEnum> typeList = new ArrayList<>();
+            for (LotteryCategoryEnum item : types) {
+                if (item.getParent() != null) {
+                    typeList.add(item);
+                    keyValues.add(new NameValue(item.getName(),item.getValue().toString()));
                 }
-                return keyValues;
-            }
-            Class currentEnum = glosseryItems.get(type);
-            for (Object o : currentEnum.getEnumConstants()) {
-                IGlossary v = (IGlossary) o;
-                HashMap<String, Object> item = new HashMap<>();
-                item.put("value", v.getValue());
-                item.put("name", v.getName());
-                keyValues.add(item);
             }
             return keyValues;
-        });
+        }
+        Class currentEnum = glosseryItems.get(type);
+        for (Object o : currentEnum.getEnumConstants()) {
+            IGlossary v = (IGlossary) o;
+            keyValues.add(new NameValue(v.getName(),v.getValue().toString()));
+        }
+        return keyValues;
     }
 
 

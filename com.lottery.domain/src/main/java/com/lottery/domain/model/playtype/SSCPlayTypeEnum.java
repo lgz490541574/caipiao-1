@@ -5,10 +5,7 @@ import com.lottery.domain.model.LotteryCategoryEnum;
 import com.lottery.domain.util.OrderSplitTools;
 import com.lottery.domain.util.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -17,545 +14,569 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
     /**
      * 重庆时时彩一星复式
      */
-    YX_FS("一星复式",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code, String weiShu) {
-                    String[] resultCodes = issueResult.split(",");
-                    if (code.equals(resultCodes[Integer.parseInt(weiShu) - WeiShuEnum.WAN_WEI.getValue()])) {
-                        return true;
-                    }
-                    return false;
+    YX_FS("一星复式", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code, String weiShu) {
+            String[] resultCodes = issueResult.split(",");
+            if (code.equals(resultCodes[Integer.parseInt(weiShu) - WeiShuEnum.WAN_WEI.getValue()])) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode, String weiShu) {
+            TicketRule[] ticketRules = YX_FS.rules;
+            for (String item : ticketRules[Integer.parseInt(weiShu) - WeiShuEnum.WAN_WEI.getValue()].getValues()) {
+                if (item.equals(ticketCode)) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode, String weiShu) {
-                    TicketRule[] ticketRules = YX_FS.rules;
-                    for (String item : ticketRules[Integer.parseInt(weiShu) - WeiShuEnum.WAN_WEI.getValue()].getValues()) {
-                        if (item.equals(ticketCode)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            },(LotteryCategoryEnum lotteryType, String playName, String ...code) -> {
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... code) -> {
         return OrderSplitTools.getSscYxfsTicketInfos(lotteryType, playName, code);
-    },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
     /**
      * 重庆时时彩两面
      */
-    LM_LM( "两面",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code, String weiShu) {
-                    String[] resultCodes = issueResult.split(",");
-                    /**总和*/
-                    if (weiShu.equals(WeiShuEnum.ZONG_HE.getValue() + "")) {
-                        int sum = 0;
-                        for (String item : resultCodes) {
-                            sum += Integer.parseInt(item);
-                        }
-                        if (sum > 22) {
-                            /**和大*/
-                            if (code.equals("和大")) {
-                                return true;
-                            }
-                        } else {
-                            /**和小*/
-                            if (code.equals("和小")) {
-                                return true;
-                            }
-                        }
-                        if (sum % 2 == 1) {
-                            /**和单*/
-                            if (code.equals("和单")) {
-                                return true;
-                            }
-                        } else {
-                            /**和双*/
-                            if (code.equals("和双")) {
-                                return true;
-                            }
-                        }
-                    } else {/**单个位数*/
-                        Integer weiShuCode = Integer.parseInt(resultCodes[Integer.parseInt(weiShu) - WeiShuEnum.WAN_WEI.getValue()]);
-                        if (weiShuCode > 4) {
-                            /**大*/
-                            if (code.equals("大")) {
-                                return true;
-                            }
-                        } else {
-                            /**小*/
-                            if (code.equals("小")) {
-                                return true;
-                            }
-                        }
-                        if (weiShuCode % 2 == 1) {
-                            /**单*/
-                            if (code.equals("单")) {
-                                return true;
-                            }
-                        } else {
-                            /**双*/
-                            if (code.equals("双")) {
-                                return true;
-                            }
-                        }
-                        String zhi = "1,2,3,5,7";
-                        if (zhi.contains(resultCodes[Integer.parseInt(weiShu)- WeiShuEnum.WAN_WEI.getValue()])) {
-                            /**质*/
-                            if (code.equals("质")) {
-                                return true;
-                            }
-                        } else {
-                            /**合*/
-                            if (code.equals("合")) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
+    LM_LM("两面", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code, String weiShu) {
+            String[] resultCodes = issueResult.split(",");
+            /**总和*/
+            if (weiShu.equals(WeiShuEnum.ZONG_HE.getValue() + "")) {
+                int sum = 0;
+                for (String item : resultCodes) {
+                    sum += Integer.parseInt(item);
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode, String weiShu) {
-                    TicketRule[] ticketRules = LM_LM.rules;
-                    if (weiShu.equals(WeiShuEnum.ZONG_HE.getValue() + "")) {
-                        for (String item : ticketRules[0].getValues()) {
-                            if (item.equals(ticketCode)) {
-                                return true;
-                            }
-                        }
-                    } else {
-                        for (String item : ticketRules[Integer.parseInt(weiShu)].getValues()) {
-                            if (item.equals(ticketCode)) {
-                                return true;
-                            }
-                        }
+                if (sum > 22) {
+                    /**和大*/
+                    if (code.equals("和大")) {
+                        return true;
                     }
-                    return false;
+                } else {
+                    /**和小*/
+                    if (code.equals("和小")) {
+                        return true;
+                    }
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.getSscLmTicketInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.ZONG_HE.getName(), CodeEnum.SSC_CODE_LMZH.getCodes()),
-                    new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes()),
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes()),
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes())
-            }),
+                if (sum % 2 == 1) {
+                    /**和单*/
+                    if (code.equals("和单")) {
+                        return true;
+                    }
+                } else {
+                    /**和双*/
+                    if (code.equals("和双")) {
+                        return true;
+                    }
+                }
+            } else {/**单个位数*/
+                Integer weiShuCode = Integer.parseInt(resultCodes[Integer.parseInt(weiShu) - WeiShuEnum.WAN_WEI.getValue()]);
+                if (weiShuCode > 4) {
+                    /**大*/
+                    if (code.equals("大")) {
+                        return true;
+                    }
+                } else {
+                    /**小*/
+                    if (code.equals("小")) {
+                        return true;
+                    }
+                }
+                if (weiShuCode % 2 == 1) {
+                    /**单*/
+                    if (code.equals("单")) {
+                        return true;
+                    }
+                } else {
+                    /**双*/
+                    if (code.equals("双")) {
+                        return true;
+                    }
+                }
+                String zhi = "1,2,3,5,7";
+                if (zhi.contains(resultCodes[Integer.parseInt(weiShu) - WeiShuEnum.WAN_WEI.getValue()])) {
+                    /**质*/
+                    if (code.equals("质")) {
+                        return true;
+                    }
+                } else {
+                    /**合*/
+                    if (code.equals("合")) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode, String weiShu) {
+            TicketRule[] ticketRules = LM_LM.rules;
+            if (weiShu.equals(WeiShuEnum.ZONG_HE.getValue() + "")) {
+                for (String item : ticketRules[0].getValues()) {
+                    if (item.equals(ticketCode)) {
+                        return true;
+                    }
+                }
+            } else {
+                for (String item : ticketRules[Integer.parseInt(weiShu)].getValues()) {
+                    if (item.equals(ticketCode)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.getSscLmTicketInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.ZONG_HE.getName(), CodeEnum.SSC_CODE_LMZH.getCodes()), new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes()), new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes()), new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes()), new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes()), new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_LMDX.getCodes())}),
     /**
      * 重庆时时彩龙虎斗
      */
-    LH_LHD("龙虎斗",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code, String weiShu) {
-                    String[] resultCodes = issueResult.split(",");
-                    List<List<Integer>> resultList = new ArrayList<>();
-                    /**构造10组龙虎斗数据*/
-                    for (int i = 0; i < 4; i++) {
-                        for (int j = i + 1; j < 5; j++) {
-                            List<Integer> itemList = new ArrayList<>();
-                            itemList.add(Integer.parseInt(resultCodes[i]));
-                            itemList.add(Integer.parseInt(resultCodes[j]));
-                            resultList.add(itemList);
-                        }
-                    }
-                    List<Integer> item = resultList.get(Integer.parseInt(weiShu) - WeiShuEnum.WAN_QIAN.getValue());
-                    Integer one = item.get(0);
-                    Integer two = item.get(1);
-                    if (one > two) {
-                        /**结果为龙*/
-                        if (code.equals("龙")) {
-                            return true;
-                        }
-                    } else if (one < two) {
-                        /**结果为虎*/
-                        if (code.equals("虎")) {
-                            return true;
-                        }
-                    } else {
-                        /**结果为合*/
-                        if (code.equals("和")) {
-                            return true;
-                        }
-                    }
-                    return false;
+    LH_LHD("龙虎斗", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code, String weiShu) {
+            String[] resultCodes = issueResult.split(",");
+            List<List<Integer>> resultList = new ArrayList<>();
+            /**构造10组龙虎斗数据*/
+            for (int i = 0; i < 4; i++) {
+                for (int j = i + 1; j < 5; j++) {
+                    List<Integer> itemList = new ArrayList<>();
+                    itemList.add(Integer.parseInt(resultCodes[i]));
+                    itemList.add(Integer.parseInt(resultCodes[j]));
+                    resultList.add(itemList);
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode, String weiShu) {
-                    TicketRule[] ticketRules = LH_LHD.rules;
-                    for (String item : ticketRules[Integer.parseInt(weiShu) - WeiShuEnum.WAN_QIAN.getValue()].getValues()) {
-                        if (item.equals(ticketCode)) {
-                            return true;
-                        }
-                    }
-                    return false;
+            }
+            List<Integer> item = resultList.get(Integer.parseInt(weiShu) - WeiShuEnum.WAN_QIAN.getValue());
+            Integer one = item.get(0);
+            Integer two = item.get(1);
+            if (one > two) {
+                /**结果为龙*/
+                if (code.equals("龙")) {
+                    return true;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.getSscLhdTicketInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.WAN_QIAN.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.WAN_BAI.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.WAN_SHI.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.WAN_GE.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_BAI.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_SHI.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_GE.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_SHI.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_GE.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-                    new TicketRule(WeiShuEnum.SHI_GE.getName(), CodeEnum.SSC_CODE_LH.getCodes()),
-            }),
+            } else if (one < two) {
+                /**结果为虎*/
+                if (code.equals("虎")) {
+                    return true;
+                }
+            } else {
+                /**结果为合*/
+                if (code.equals("和")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode, String weiShu) {
+            TicketRule[] ticketRules = LH_LHD.rules;
+            for (String item : ticketRules[Integer.parseInt(weiShu) - WeiShuEnum.WAN_QIAN.getValue()].getValues()) {
+                if (item.equals(ticketCode)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.getSscLhdTicketInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.WAN_QIAN.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.WAN_BAI.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.WAN_SHI.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.WAN_GE.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.QIAN_BAI.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.QIAN_SHI.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.QIAN_GE.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.BAI_SHI.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.BAI_GE.getName(), CodeEnum.SSC_CODE_LH.getCodes()), new TicketRule(WeiShuEnum.SHI_GE.getName(), CodeEnum.SSC_CODE_LH.getCodes()),}),
 
     /**
-     * 重庆时时彩豹子
+     * 特殊玩法
      */
-    CBZ_BZ("猜豹子",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code, String weiShu) {
-                    StringBuffer buf = new StringBuffer();
-                    for (int i = 0; i < 5; i++) {
-                        buf.append(code + ",");
+    TESHU_PLAY("特殊玩法", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code, String weiShu) {
+            String[] items = issueResult.split(",");
+            if (weiShu.startsWith("前三")) {
+                items = Arrays.copyOfRange(items, 0, 2);
+            }
+            if (weiShu.startsWith("中三")) {
+                items = Arrays.copyOfRange(items, 1, 3);
+            }
+            if (weiShu.startsWith("后三")) {
+                items = Arrays.copyOfRange(items, 2, 4);
+            }
+            if (weiShu.contains("豹子")) {
+                String first = null;
+                boolean prize = true;
+                for (String key : items) {
+                    if (first == null) {
+                        first = key;
+                        continue;
                     }
-                    if (issueResult.equals(buf.substring(0, buf.length() - 1))) {
-                        return true;
+                    if (!key.equals(first)) {
+                        prize = false;
+                        break;
                     }
+                }
+                if (!prize) {
                     return false;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = CBZ_BZ.rules;
-                    for (String item : ticketRules[0].getValues()) {
-                        if (item.equals(ticketCode)) {
-                            return true;
-                        }
+                return true;
+            }
+            if (weiShu.contains("顺子")) {
+                Integer first = null;
+                boolean prize = true;
+                List<String> list = Arrays.asList(items);
+                Collections.sort(list, new Comparator<String>() {
+                    public int compare(String o1, String o2) {
+                        return o1.compareTo(o2);
                     }
+                });
+                for (String key : list) {
+                    if (first == null) {
+                        first = Integer.valueOf(key);
+                        continue;
+                    }
+                    first++;
+                    if (!key.equals(first.toString())) {
+                        prize = false;
+                        break;
+                    }
+                }
+                if (!prize) {
                     return false;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.getSscCbzTicketInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.BAO_ZI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+                return true;
+            }
+            if (weiShu.contains("对子")) {
+                Map<String, String> itemMap = new HashMap<>();
+                for (String key : items) {
+                    itemMap.put(key, key);
+                }
+                if (itemMap.keySet().size() == 2) {
+                    return true;
+                }
+                return false;
+            }
+            if (weiShu.contains("半顺")) {
+                Integer first = null;
+                List<String> list = Arrays.asList(items);
+                Collections.sort(list, new Comparator<String>() {
+                    public int compare(String o1, String o2) {
+                        return o1.compareTo(o2);
+                    }
+                });
+                int sunCount = 0;
+                for (String key : list) {
+                    boolean init = false;
+                    if (first == null) {
+                        first = Integer.valueOf(key);
+                        continue;
+                    }
+                    first++;
+                    if (key.equals(first.toString())) {
+                        sunCount++;
+                    }
+                    first = Integer.valueOf(key);
+                }
+                if (sunCount == 1) {
+                    return true;
+                }
+            }
+
+            if (weiShu.contains("杂六")) {
+                Integer first = null;
+                List<String> list = Arrays.asList(items);
+                Map<String, String> itemMap = new HashMap<>();
+                Collections.sort(list, new Comparator<String>() {
+                    public int compare(String o1, String o2) {
+                        return o1.compareTo(o2);
+                    }
+                });
+                int sunCount = 0;
+                for (String key : list) {
+                    itemMap.put(key, key);
+                    if (first == null) {
+                        first = Integer.valueOf(key);
+                        continue;
+                    }
+                    first++;
+                    if (key.equals(first.toString())) {
+                        sunCount++;
+                    }
+                    first = Integer.valueOf(key);
+                }
+                if (sunCount == 0 && itemMap.size() == 3) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = TESHU_PLAY.rules;
+            for (String item : ticketRules[0].getValues()) {
+                if (item.equals(ticketCode)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.getSscCbzTicketInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.BAO_ZI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
+
     /**
      * 大小单双前二
      */
-    DXDS_QE("前二",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    Integer one = Integer.parseInt(resultCodes[0]);
-                    Integer two = Integer.parseInt(resultCodes[1]);
-                    List<List<String>> dimValue = new ArrayList<>();
-                    dimValue.add(getSingleTwo(one));
-                    dimValue.add(getSingleTwo(two));
-                    List<String> result = getMoreRecursive(dimValue);
-                    for (String item : result) {
-                        if (item.equals(code)) {
-                            return true;
-                        }
-                    }
-                    return false;
+    DXDS_QE("前二大小单双", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer one = Integer.parseInt(resultCodes[0]);
+            Integer two = Integer.parseInt(resultCodes[1]);
+            List<List<String>> dimValue = new ArrayList<>();
+            dimValue.add(getSingleTwo(one));
+            dimValue.add(getSingleTwo(two));
+            List<String> result = getMoreRecursive(dimValue);
+            for (String item : result) {
+                if (item.equals(code)) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = DXDS_QE.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = DXDS_QE.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()), new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes())}),
     /**
      * 时时彩大小单双 后二
      */
-    DXDS_HE("后二",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    Integer four = Integer.parseInt(resultCodes[3]);
-                    Integer five = Integer.parseInt(resultCodes[4]);
-                    List<List<String>> dimValue = new ArrayList<>();
-                    dimValue.add(getSingleTwo(four));
-                    dimValue.add(getSingleTwo(five));
-                    List<String> result = getMoreRecursive(dimValue);
-                    for (String item : result) {
-                        if (item.equals(code)) {
-                            return true;
-                        }
-                    }
-                    return false;
+    DXDS_HE("后二大小单双", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer four = Integer.parseInt(resultCodes[3]);
+            Integer five = Integer.parseInt(resultCodes[4]);
+            List<List<String>> dimValue = new ArrayList<>();
+            dimValue.add(getSingleTwo(four));
+            dimValue.add(getSingleTwo(five));
+            List<String> result = getMoreRecursive(dimValue);
+            for (String item : result) {
+                if (item.equals(code)) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = DXDS_HE.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = DXDS_HE.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()), new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes())}),
     /**
      * 重庆时时彩大小单双 前三
      */
-    DXDS_QS("前三",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    Integer one = Integer.parseInt(resultCodes[0]);
-                    Integer two = Integer.parseInt(resultCodes[1]);
-                    Integer three = Integer.parseInt(resultCodes[2]);
-                    List<List<String>> dimValue = new ArrayList<>();
-                    dimValue.add(getSingleTwo(one));
-                    dimValue.add(getSingleTwo(two));
-                    dimValue.add(getSingleTwo(three));
-                    List<String> result = getMoreRecursive(dimValue);
-                    for (String item : result) {
-                        if (item.equals(code)) {
-                            return true;
-                        }
-                    }
-                    return false;
+    DXDS_QS("前三大小单双", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer one = Integer.parseInt(resultCodes[0]);
+            Integer two = Integer.parseInt(resultCodes[1]);
+            Integer three = Integer.parseInt(resultCodes[2]);
+            List<List<String>> dimValue = new ArrayList<>();
+            dimValue.add(getSingleTwo(one));
+            dimValue.add(getSingleTwo(two));
+            dimValue.add(getSingleTwo(three));
+            List<String> result = getMoreRecursive(dimValue);
+            for (String item : result) {
+                if (item.equals(code)) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = DXDS_QS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = DXDS_QS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()), new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()), new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),}),
     /**
      * 重庆时时彩大小单双 后三
      */
-    DXDS_HS("后三",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    Integer three = Integer.parseInt(resultCodes[2]);
-                    Integer four = Integer.parseInt(resultCodes[3]);
-                    Integer five = Integer.parseInt(resultCodes[4]);
-                    List<List<String>> dimValue = new ArrayList<>();
-                    dimValue.add(getSingleTwo(three));
-                    dimValue.add(getSingleTwo(four));
-                    dimValue.add(getSingleTwo(five));
-                    List<String> result = getMoreRecursive(dimValue);
-                    for (String item : result) {
-                        if (item.equals(code)) {
-                            return true;
-                        }
-                    }
-                    return false;
+    DXDS_HS("后三大小单双", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer three = Integer.parseInt(resultCodes[2]);
+            Integer four = Integer.parseInt(resultCodes[3]);
+            Integer five = Integer.parseInt(resultCodes[4]);
+            List<List<String>> dimValue = new ArrayList<>();
+            dimValue.add(getSingleTwo(three));
+            dimValue.add(getSingleTwo(four));
+            dimValue.add(getSingleTwo(five));
+            List<String> result = getMoreRecursive(dimValue);
+            for (String item : result) {
+                if (item.equals(code)) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = DXDS_HS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = DXDS_HS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()),
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()), new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes()), new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_DXDS.getCodes())}),
     /**
      * 重庆时时彩前二 前二复式
      */
-    QE_FS("前二复式",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String qeFs = resultCodes[0] + "," + resultCodes[1];
-                    if (qeFs.equals(code)) {
-                        return true;
+    QE_FS("前二复式", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            String qeFs = resultCodes[0] + "," + resultCodes[1];
+            if (qeFs.equals(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = QE_FS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    return false;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = QE_FS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
-                    }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
     /**
      * 重庆时时彩前二 前二和值
      */
-    QE_HZ("前二和值",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String qeFs = resultCodes[0] + "," + resultCodes[1];
-                    if (qeFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = QE_HZ.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String code : codes) {
-                        sum += Integer.parseInt(code);
-                    }
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == sum) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = OrderSplitTools.getZxHzList(2, codes[0].split(","));
-                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-                            "10", "11", "12", "13", "14", "15", "16", "17", "18"})
-            }),
-    /**
-     * 重庆时时彩前二 前二跨度
-     */
-    QE_KD("前二跨度",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String qeFs = resultCodes[0] + "," + resultCodes[1];
-                    if (qeFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
-                }
-            }, new AbstractValidateOrder() {
+    QE_HZ("前二和值", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer value = Integer.valueOf(resultCodes[0]) + Integer.valueOf(resultCodes[1]);
+            if (value.equals(Integer.valueOf(code))) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
         @Override
         public boolean checkTicketCode(String ticketCode) {
             TicketRule[] ticketRules = QE_HZ.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String code : codes) {
+                sum += Integer.parseInt(code);
+            }
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == sum) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        List<String> result = OrderSplitTools.getZxHzList(2, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"})}),
+    /**
+     * 重庆时时彩前二 前二跨度
+     */
+    QE_KD("前二跨度", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer value = Integer.valueOf(resultCodes[1]) - Integer.valueOf(resultCodes[1]);
+            if (Math.abs(value.intValue()) == Integer.valueOf(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = QE_KD.rules;
             List<String> codes = Arrays.asList(ticketCode.split(","));
             int max = Integer.parseInt(Collections.max(codes));
             int min = Integer.parseInt(Collections.min(codes));
@@ -567,573 +588,528 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
             }
             return false;
         }
-    },(LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
         List<String> result = OrderSplitTools.getZxKdList(2, codes[0].split(","));
         return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-    },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-            }),
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),}),
     /**
      * 重庆时时彩后二 后二复式
      */
-    HE_FS("后二复式",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String heFs = resultCodes[3] + "," + resultCodes[4];
-                    if (heFs.equals(code)) {
-                        return true;
+    HE_FS("后二复式", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            String heFs = resultCodes[3] + "," + resultCodes[4];
+            if (heFs.equals(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = HE_FS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    return false;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = HE_FS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
-                    }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
-                }
-            },(LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
         return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-    },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
     /**
      * 重庆时时彩后二 后二和值
      */
-    HE_HZ("后二和值",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String heFs = resultCodes[3] + "," + resultCodes[4];
-                    if (heFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
+    HE_HZ("后二和值", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer value = Integer.valueOf(resultCodes[3]) + Integer.valueOf(resultCodes[4]);
+            if (value.equals(Integer.valueOf(code))) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = HE_HZ.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String code : codes) {
+                sum += Integer.parseInt(code);
+            }
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == sum) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = HE_HZ.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String code : codes) {
-                        sum += Integer.parseInt(code);
-                    }
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == sum) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            },(LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
         List<String> result = OrderSplitTools.getZxHzList(2, codes[0].split(","));
         return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-    },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-                            "10", "11", "12", "13", "14", "15", "16", "17", "18"})
-            }),
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"})}),
     /**
      * 重庆时时彩后二 后二跨度
      */
-    HE_KD("后二跨度",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String heFs = resultCodes[3] + "," + resultCodes[4];
-                    if (heFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
+    HE_KD("后二跨度", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer value = Integer.valueOf(resultCodes[0]) - Integer.valueOf(resultCodes[1]);
+            if (value.equals(Integer.valueOf(code))) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = HE_KD.rules;
+            List<String> codes = Arrays.asList(ticketCode.split(","));
+            int max = Integer.parseInt(Collections.max(codes));
+            int min = Integer.parseInt(Collections.min(codes));
+            int minus = max - min;
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == minus) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = HE_KD.rules;
-                    List<String> codes = Arrays.asList(ticketCode.split(","));
-                    int max = Integer.parseInt(Collections.max(codes));
-                    int min = Integer.parseInt(Collections.min(codes));
-                    int minus = max - min;
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == minus) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            },(LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
         List<String> result = OrderSplitTools.getZxKdList(2, codes[0].split(","));
         return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-    },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-            }),
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),}),
     /**
      * 重庆时时彩前三 前三复式
      */
-    QS_FS("前三复式",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String qsFs = resultCodes[0] + "," + resultCodes[1] + "," + resultCodes[2];
-                    if (qsFs.equals(code)) {
-                        return true;
+    QS_FS("前三复式", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            String qsFs = resultCodes[0] + "," + resultCodes[1] + "," + resultCodes[2];
+            if (qsFs.equals(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = QS_FS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    return false;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = QS_FS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
-                    }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
     /**
      * 重庆时时彩前三 前三和值
      */
-    QS_HZ("前三和值",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String qsFs = resultCodes[0] + "," + resultCodes[1] + "," + resultCodes[2];
-                    if (qsFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
+    QS_HZ("前三和值", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer value = Integer.valueOf(resultCodes[0]) + Integer.valueOf(resultCodes[1]) + Integer.valueOf(resultCodes[2]);
+            if (Integer.valueOf(code).equals(value)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = QS_HZ.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String code : codes) {
+                sum += Integer.parseInt(code);
+            }
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == sum) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = QS_HZ.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String code : codes) {
-                        sum += Integer.parseInt(code);
-                    }
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == sum) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
-                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-                            "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"})
-            }),
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"})}),
     /**
      * 重庆时时彩前三 前三跨度
      */
-    QS_KD("前三跨度",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String qsFs = resultCodes[0] + "," + resultCodes[1] + "," + resultCodes[2];
-                    if (qsFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
+    QS_KD("前三跨度", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer maxValue = null;
+            Integer minValue = null;
+            List<Integer> values = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                Integer value = Integer.valueOf(resultCodes[i]);
+                if (maxValue == null) {
+                    maxValue = value;
+                    minValue = value;
+                    continue;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = QS_KD.rules;
-                    List<String> codes = Arrays.asList(ticketCode.split(","));
-                    int max = Integer.parseInt(Collections.max(codes));
-                    int min = Integer.parseInt(Collections.min(codes));
-                    int minus = max - min;
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == minus) {
-                            return true;
-                        }
-                    }
-                    return false;
+                if (value.intValue() > maxValue.intValue()) {
+                    maxValue = value;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
-                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-            }),
+                if (value.intValue() < minValue.intValue()) {
+                    minValue = value;
+                }
+            }
+            Integer value = maxValue.intValue() - minValue.intValue();
+            if (value.intValue() == Integer.valueOf(code).intValue()) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = QS_KD.rules;
+            List<String> codes = Arrays.asList(ticketCode.split(","));
+            int max = Integer.parseInt(Collections.max(codes));
+            int min = Integer.parseInt(Collections.min(codes));
+            int minus = max - min;
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == minus) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),}),
     /**
      * 重庆时时彩中三 中三复式
      */
-    ZS_FS("中三复式",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String zsFs = resultCodes[1] + "," + resultCodes[2] + "," + resultCodes[3];
-                    if (zsFs.equals(code)) {
-                        return true;
+    ZS_FS("中三复式", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            String zsFs = resultCodes[1] + "," + resultCodes[2] + "," + resultCodes[3];
+            if (zsFs.equals(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = ZS_FS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    return false;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = ZS_FS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
-                    }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
     /**
      * 重庆时时彩中三 中三和值
      */
-    ZS_HZ("中三和值",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String zsFs = resultCodes[1] + "," + resultCodes[2] + "," + resultCodes[3];
-                    if (zsFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
+    ZS_HZ("中三和值", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer value = Integer.valueOf(resultCodes[1]) + Integer.valueOf(resultCodes[2]) + Integer.valueOf(resultCodes[3]);
+            if (value.equals(Integer.valueOf(code))) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = ZS_HZ.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String code : codes) {
+                sum += Integer.parseInt(code);
+            }
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == sum) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = ZS_HZ.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String code : codes) {
-                        sum += Integer.parseInt(code);
-                    }
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == sum) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
-                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-                            "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"})
-            }),
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"})}),
     /**
      * 重庆时时彩中三 中三跨度
      */
-    ZS_KD("中三跨度",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String zsFs = resultCodes[1] + "," + resultCodes[2] + "," + resultCodes[3];
-                    if (zsFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
+    ZS_KD("中三跨度", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer maxValue = null;
+            Integer minValue = null;
+            List<Integer> values = new ArrayList<>();
+            for (int i = 1; i < 4; i++) {
+                Integer value = Integer.valueOf(resultCodes[i]);
+                if (maxValue == null) {
+                    maxValue = value;
+                    minValue = value;
+                    continue;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = ZS_KD.rules;
-                    List<String> codes = Arrays.asList(ticketCode.split(","));
-                    int max = Integer.parseInt(Collections.max(codes));
-                    int min = Integer.parseInt(Collections.min(codes));
-                    int minus = max - min;
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == minus) {
-                            return true;
-                        }
-                    }
-                    return false;
+                if (value.intValue() > maxValue.intValue()) {
+                    maxValue = value;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
-                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-            }),
+                if (value.intValue() < minValue.intValue()) {
+                    minValue = value;
+                }
+            }
+            Integer value = maxValue.intValue() - minValue.intValue();
+            if (value.intValue() == Integer.valueOf(code).intValue()) {
+                return true;
+            }
+
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = ZS_KD.rules;
+            List<String> codes = Arrays.asList(ticketCode.split(","));
+            int max = Integer.parseInt(Collections.max(codes));
+            int min = Integer.parseInt(Collections.min(codes));
+            int minus = max - min;
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == minus) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),}),
     /**
      * 重庆时时彩后三 后三复式
      */
-    HS_FS("后三复式",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String hsFs = resultCodes[2] + "," + resultCodes[3] + "," + resultCodes[4];
-                    if (hsFs.equals(code)) {
-                        return true;
+    HS_FS("后三复式", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            String hsFs = resultCodes[2] + "," + resultCodes[3] + "," + resultCodes[4];
+            if (hsFs.equals(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = HS_FS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    return false;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = HS_FS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
-                    }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
     /**
      * 重庆时时彩后三 后三和值
      */
-    HS_HZ("后三和值",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String hsFs = resultCodes[2] + "," + resultCodes[3] + "," + resultCodes[4];
-                    if (hsFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
+    HS_HZ("后三和值", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            Integer value = Integer.valueOf(resultCodes[2]) + Integer.valueOf(resultCodes[3]) + Integer.valueOf(resultCodes[4]);
+            if (value.equals(Integer.valueOf(code))) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = HS_HZ.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String code : codes) {
+                sum += Integer.parseInt(code);
+            }
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == sum) {
+                    return true;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = HS_HZ.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String code : codes) {
-                        sum += Integer.parseInt(code);
-                    }
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == sum) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
-                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-                            "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"})
-            }),
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        List<String> result = OrderSplitTools.getZxHzList(3, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.HZ_ZHI.getName(), new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"})}),
     /**
      * 重庆时时彩后三 后三跨度
      */
-    HS_KD("后三跨度",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String[] resultCodes = issueResult.split(",");
-                    String hsFs = resultCodes[2] + "," + resultCodes[3] + "," + resultCodes[4];
-                    if (hsFs.equals(code)) {
-                        return true;
-                    }
-                    return false;
+    HS_KD("后三跨度", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String[] resultCodes = issueResult.split(",");
+            String hsFs = resultCodes[2] + "," + resultCodes[3] + "," + resultCodes[4];
+
+            Integer maxValue = null;
+            Integer minValue = null;
+            List<Integer> values = new ArrayList<>();
+            for (int i = 2; i < 5; i++) {
+                Integer value = Integer.valueOf(resultCodes[i]);
+                if (maxValue == null) {
+                    maxValue = value;
+                    minValue = value;
+                    continue;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = HS_KD.rules;
-                    List<String> codes = Arrays.asList(ticketCode.split(","));
-                    int max = Integer.parseInt(Collections.max(codes));
-                    int min = Integer.parseInt(Collections.min(codes));
-                    int minus = max - min;
-                    for (String item : ticketRules[0].getValues()) {
-                        if (Integer.parseInt(item) == minus) {
-                            return true;
-                        }
-                    }
-                    return false;
+                if (value.intValue() > maxValue.intValue()) {
+                    maxValue = value;
                 }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
-                return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-            }),
+                if (value.intValue() < minValue.intValue()) {
+                    minValue = value;
+                }
+            }
+            Integer value = maxValue.intValue() - minValue.intValue();
+            if (value.intValue() == Integer.valueOf(code).intValue()) {
+                return true;
+            }
+            if (hsFs.equals(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = HS_KD.rules;
+            List<String> codes = Arrays.asList(ticketCode.split(","));
+            int max = Integer.parseInt(Collections.max(codes));
+            int min = Integer.parseInt(Collections.min(codes));
+            int minus = max - min;
+            for (String item : ticketRules[0].getValues()) {
+                if (Integer.parseInt(item) == minus) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        List<String> result = OrderSplitTools.getZxKdList(3, codes[0].split(","));
+        return OrderSplitTools.buildTicketInfos(lotteryType, playName, result.toArray(new String[result.size()]));
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.KU_DU.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),}),
     /**
      * 重庆时时彩四星 四星复式
      */
-    SX_FS("四星复式",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    String sxFs = issueResult.substring(0, issueResult.length() - 2);
-                    if (sxFs.equals(code)) {
-                        return true;
+    SX_FS("四星复式", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            String sxFs = issueResult.substring(0, issueResult.length() - 2);
+            if (sxFs.equals(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = SX_FS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    return false;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = SX_FS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
-                    }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
     /**
      * 重庆时时彩五星 五星复式
      */
-    WX_FS("五星复式",
-            new AbstractPrizeCheck() {
-                @Override
-                public boolean isPrize(String issueResult, String code) {
-                    if (issueResult.equals(code)) {
-                        return true;
+    WX_FS("五星复式", new AbstractPrizeCheck() {
+        @Override
+        public boolean isPrize(String issueResult, String code) {
+            if (issueResult.equals(code)) {
+                return true;
+            }
+            return false;
+        }
+    }, new AbstractValidateOrder() {
+        @Override
+        public boolean checkTicketCode(String ticketCode) {
+            TicketRule[] ticketRules = WX_FS.rules;
+            String[] codes = ticketCode.split(",");
+            int sum = 0;
+            for (String item : ticketRules[0].getValues()) {
+                for (String code : codes) {
+                    if (item.equals(code)) {
+                        sum++;
                     }
-                    return false;
                 }
-            },
-            new AbstractValidateOrder() {
-                @Override
-                public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = WX_FS.rules;
-                    String[] codes = ticketCode.split(",");
-                    int sum = 0;
-                    for (String item : ticketRules[0].getValues()) {
-                        for (String code : codes) {
-                            if (item.equals(code)) {
-                                sum++;
-                            }
-                        }
-                    }
-                    if (sum == codes.length) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            (LotteryCategoryEnum lotteryType, String playName, String ...codes) -> {
-                return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
-            },
-            new TicketRule[]{
-                    new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()),
-                    new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())
-            }),
+            }
+            if (sum == codes.length) {
+                return true;
+            }
+            return false;
+        }
+    }, (LotteryCategoryEnum lotteryType, String playName, String... codes) -> {
+        return OrderSplitTools.buildDiKaErTickrtInfos(lotteryType, playName, codes);
+    }, new TicketRule[]{new TicketRule(WeiShuEnum.WAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.QIAN_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.BAI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.SHI_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes()), new TicketRule(WeiShuEnum.GE_WEI.getName(), CodeEnum.SSC_CODE_NUMBER.getCodes())}),
 
     ;
     /**
@@ -1153,12 +1129,13 @@ public enum SSCPlayTypeEnum implements IGlossary, IPlayType {
      */
     private String name;
     private IOrderSplit orderSplit;
-    SSCPlayTypeEnum(String name, IPrizeCheck prizeCheck, IValidateOrder orderCheck,IOrderSplit orderSplit, TicketRule... rules) {
+
+    SSCPlayTypeEnum(String name, IPrizeCheck prizeCheck, IValidateOrder orderCheck, IOrderSplit orderSplit, TicketRule... rules) {
         this.name = name;
         this.prizeCheck = prizeCheck;
         this.orderCheck = orderCheck;
         this.rules = rules;
-        this.orderSplit=orderSplit;
+        this.orderSplit = orderSplit;
     }
 
     public TicketRule[] getRules() {

@@ -1,18 +1,24 @@
 package com.lottery.service.impl;
 
+import com.account.rpc.AccountRPCService;
+import com.account.rpc.dto.InvokeBizDto;
 import com.common.exception.ApplicationException;
 import com.common.mongo.AbstractMongoService;
-import com.common.util.*;
+import com.common.util.GlosseryEnumUtils;
+import com.common.util.RPCResult;
+import com.common.util.StringUtils;
+import com.common.util.model.OrderTypeEnum;
 import com.common.util.model.YesOrNoEnum;
 import com.lottery.domain.*;
+import com.lottery.domain.model.LotteryCategoryEnum;
 import com.lottery.domain.model.ProfitEnum;
+import com.lottery.domain.util.CodeEnum;
 import com.lottery.domain.util.IPlayType;
 import com.lottery.domain.util.OrderSplitTools;
 import com.lottery.service.*;
 import com.lottery.service.dto.PeriodResult;
+import com.lottery.service.exception.PreBuildPeriodException;
 import com.lottery.service.util.IResultBuilder;
-import com.lottery.domain.model.LotteryCategoryEnum;
-import com.lottery.domain.util.CodeEnum;
 import com.mongodb.client.result.UpdateResult;
 import com.passport.rpc.ProxyInfoRPCService;
 import com.passport.rpc.dto.ProxyDto;
@@ -43,6 +49,11 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
     private Map<LotteryCategoryEnum, IResultBuilder> resultBuilderMap = new HashMap<>();
     private Random r = new Random();
 
+    /**
+     * 资金账户类型
+     */
+    private Integer TokenType = 1;
+
     @Resource
     private OrderService orderService;
     @Resource
@@ -67,6 +78,66 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
 
     @Reference
     private ProxyInfoRPCService proxyInfoRPCService;
+
+    @Reference
+    private AccountRPCService accountRPCService;
+
+    @PostConstruct
+    public void init() {
+        this.buildPropertyDescriptor();
+        LotteryCategoryEnum[] types = LotteryCategoryEnum.values();
+        List<ProxyDto> listRPCResult = proxyInfoRPCService.queryAll().getData();
+        for (LotteryCategoryEnum item : types) {
+            if (item.getParent() != null) {
+                if (item.getPrivateLottery() == YesOrNoEnum.YES) {
+                    for (ProxyDto dto : listRPCResult) {
+                        buildIndex(getCollectionName(item, dto.getId()));
+                    }
+                } else {
+                    buildIndex(getCollectionName(item, null));
+                }
+            }
+        }
+        buildIndex(primaryTemplate.getCollectionName(getEntityClass()));
+        //快三生成结果
+        resultBuilderMap.put(LotteryCategoryEnum.KS, () -> {
+            List<String> ksCodes = Arrays.asList(CodeEnum.KS_CODE_NUMBER.getCodes());
+            return buildPeriodResult(ksCodes, 3, false, true);
+        });
+        //时时彩生成结果
+        resultBuilderMap.put(LotteryCategoryEnum.SSC, () -> {
+            List<String> sscCodes = Arrays.asList(CodeEnum.SSC_CODE_NUMBER.getCodes());
+            //彩票号码个数
+            int size = 5;
+            //号码重复
+            boolean repeat = false;
+            //号码是否排序
+            boolean sort = false;
+            return buildPeriodResult(sscCodes, size, repeat, sort);
+        });
+        //pk10生成结果
+        resultBuilderMap.put(LotteryCategoryEnum.PK10, () -> {
+            List<String> codes = Arrays.asList(CodeEnum.PK10_CODE_NUMBER.getCodes());
+            //彩票号码个数
+            int size = 10;
+            //号码重复
+            boolean repeat = true;
+            //号码是否排序
+            boolean sort = false;
+            return buildPeriodResult(codes, size, repeat, sort);
+        });
+        //六合彩生成结果
+        resultBuilderMap.put(LotteryCategoryEnum.LHC, () -> {
+            List<String> codes = Arrays.asList(CodeEnum.LHC_CODE_NUMBER.getCodes());
+            //彩票号码个数
+            int size = 7;
+            //号码重复
+            boolean repeat = true;
+            //号码是否排序
+            boolean sort = false;
+            return buildPeriodResult(codes, size, repeat, sort);
+        });
+    }
 
     @Override
     public void buildLHCPeriod(String money) {
@@ -114,8 +185,8 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
      * @param countList
      * @return
      */
-    public String getBestRatePeriodCode(PeriodConfig periodConfig, List<PeriodResult> countList, LotteryCategoryEnum category) {
-        String result = null;
+    public PeriodResult getBestRatePeriodCode(PeriodConfig periodConfig, List<PeriodResult> countList, LotteryCategoryEnum category) {
+        PeriodResult result = null;
         Map<String, BigDecimal> decimalMap = countProfitAndLoss(periodConfig);
         //为正数 最大亏损金额 比如-5000
         BigDecimal maxLossMoney = decimalMap.get("maxLossMoney");
@@ -131,7 +202,7 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         int status;
         //随机模式则随机输赢模式
         if (periodConfig.getStatus().intValue() == ProfitEnum.RANDOM.getValue()) {
-            status = r.nextInt(100) + 1;
+            status = buildNextStatus(periodConfig.getWeight());
         } else {
             status = periodConfig.getStatus().intValue();
         }
@@ -139,47 +210,51 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         List<PeriodResult> profitList = new ArrayList<>();
         //配置内的亏损数据
         List<PeriodResult> lossList = new ArrayList<>();
-        //配置外的亏损数据 小于最大亏损金额
-        List<PeriodResult> maxLossList = new ArrayList<>();
         //超出最大盈利的数据
         List<PeriodResult> maxList = new ArrayList<>();
-        //大于最大亏损金额的数据
-        List<PeriodResult> gateMaxLoss = new ArrayList<>();
         for (PeriodResult periodResult : countList) {
             BigDecimal profileMoney = periodResult.getProfileMoney();
             BigDecimal itemRate = periodResult.getRate();
             //盈利模式
-            if (itemRate.compareTo(BigDecimal.ZERO) > 0
-                    && itemRate.compareTo(maxProfit) <= 0) {
+            if (itemRate.compareTo(BigDecimal.ZERO) > 0 && itemRate.compareTo(maxProfit) <= 0) {
                 profitList.add(periodResult);
             }
             //亏损模式
-            if (itemRate.compareTo(BigDecimal.ZERO) <= 0
-                    && itemRate.compareTo(maxLoss) >= 0 && profileMoney.compareTo(maxLossMoney) >= 0) {
+            if (itemRate.compareTo(BigDecimal.ZERO) <= 0 && itemRate.compareTo(maxLoss) >= 0 && profileMoney.compareTo(maxLossMoney) >= 0) {
                 lossList.add(periodResult);
-            }
-            //配置外的亏损模式
-            if (itemRate.compareTo(BigDecimal.valueOf(-2)) >= 0 && itemRate.compareTo(maxLoss) < 0 && profileMoney.compareTo(maxLossMoney) >= 0) {
-                maxLossList.add(periodResult);
             }
             //超出最大盈利数据
             if (itemRate.compareTo(maxProfit) > 0) {
                 maxList.add(periodResult);
             }
-            //大于最大亏损金额的数据
-            if (itemRate.compareTo(BigDecimal.valueOf(-62)) >= 0 && profileMoney.compareTo(maxLossMoney) >= 0) {
-                gateMaxLoss.add(periodResult);
-            }
         }
-//        if (status == ProfitEnum.PROFIT.getValue()) {
-//            log.warn(category.name() + " 盈亏状态：" + ProfitEnum.PROFIT.getName());
-//            result = getPeriodResult(profitList, lossList, maxList, maxLossList, gameType, gateMaxLoss, countList, periodConfig.getStatus());
-//        }
-//        if (status == ProfitEnum.LOSS.getValue()) {
-//            log.warn(gameType.name() + " 盈亏状态：" + ProfitEnum.LOSS.getName());
-//            result = getPeriodResult(lossList, profitList, maxLossList, maxList, gameType, gateMaxLoss, countList, periodConfig.getStatus());
-//        }
-        return result;
+        if (status == ProfitEnum.PROFIT.getValue().intValue()) {
+            log.warn(category.name() + " 盈亏状态：" + ProfitEnum.PROFIT.getName());
+            if (profitList.size() == 0) {
+                profitList = maxList;
+            }
+            return buildResult(profitList, category);
+        }
+        if (status == ProfitEnum.LOSS.getValue().intValue()) {
+            log.warn(category.name() + " 盈亏状态：" + ProfitEnum.LOSS.getName());
+            return buildResult(lossList, category);
+        }
+        throw new PreBuildPeriodException("PeriodResult.to.less");
+    }
+
+    public static PeriodResult buildResult(List<PeriodResult> resultList, LotteryCategoryEnum category) {
+        return resultList.get(random.nextInt(resultList.size()));
+    }
+
+    private static Random random = new Random();
+
+    private static int buildNextStatus(Integer weight) {
+        int i1 = random.nextInt(100);
+        if (i1 > weight) {
+            return 1;
+        } else {
+            return 2;
+        }
     }
 
     /**
@@ -190,13 +265,9 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
      * @param configs
      * @return
      */
-    public List<PeriodResult> caculateResult(LotteryCategoryEnum lotteryType, List<OrderInfo> orderList, List<Config> configs) {
+    public List<PeriodResult> caculateResult(LotteryCategoryEnum lotteryType, List<OrderInfo> orderList, Map<String,JSONArray> configs) {
         List<PeriodResult> resultCaculate = new ArrayList<>();
 
-        JSONObject typeConfig = new JSONObject();
-        for (Config config : configs) {
-            typeConfig.put(config.getKey(), JSONArray.fromObject(config.getContent()));
-        }
 
         List<String> resultList = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
@@ -209,7 +280,7 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
             for (OrderInfo info : orderList) {
                 IPlayType play = OrderSplitTools.getPlay(lotteryType, info.getPlayType());
                 List<TicketInfo> tickets = play.getOrderSplit().doSplit(lotteryType, info.getPlayType());
-                JSONArray jsonObject = typeConfig.getJSONArray(info.getPlayType());
+                JSONArray jsonObject = configs.get(info.getPlayType());
                 for (TicketInfo ticketItem : tickets) {
                     if (checkPrize(ticketItem, result, play)) {
                         double rate = buildRate(jsonObject, info.getPlayType(), ticketItem);
@@ -277,64 +348,6 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
             }
         }
         return rate;
-    }
-
-    @PostConstruct
-    public void init() {
-        this.buildPropertyDescriptor();
-        LotteryCategoryEnum[] types = LotteryCategoryEnum.values();
-        List<ProxyDto> listRPCResult = proxyInfoRPCService.queryAll().getData();
-        for (LotteryCategoryEnum item : types) {
-            if (item.getParent() != null) {
-                if (item.getPrivateLottery() == YesOrNoEnum.YES) {
-                    for (ProxyDto dto : listRPCResult) {
-                        buildIndex(getCollectionName(item, dto.getId()));
-                    }
-                } else {
-                    buildIndex(getCollectionName(item, null));
-                }
-            }
-        }
-        buildIndex(primaryTemplate.getCollectionName(getEntityClass()));
-        //快三生成结果
-        resultBuilderMap.put(LotteryCategoryEnum.KS, () -> {
-            List<String> ksCodes = Arrays.asList(CodeEnum.KS_CODE_NUMBER.getCodes());
-            return buildPeriodResult(ksCodes, 3, false, true);
-        });
-        //时时彩生成结果
-        resultBuilderMap.put(LotteryCategoryEnum.SSC, () -> {
-            List<String> sscCodes = Arrays.asList(CodeEnum.SSC_CODE_NUMBER.getCodes());
-            //彩票号码个数
-            int size = 5;
-            //号码重复
-            boolean repeat = false;
-            //号码是否排序
-            boolean sort = false;
-            return buildPeriodResult(sscCodes, size, repeat, sort);
-        });
-        //pk10生成结果
-        resultBuilderMap.put(LotteryCategoryEnum.PK10, () -> {
-            List<String> codes = Arrays.asList(CodeEnum.PK10_CODE_NUMBER.getCodes());
-            //彩票号码个数
-            int size = 10;
-            //号码重复
-            boolean repeat = true;
-            //号码是否排序
-            boolean sort = false;
-            return buildPeriodResult(codes, size, repeat, sort);
-        });
-        //六合彩生成结果
-        resultBuilderMap.put(LotteryCategoryEnum.LHC, () ->
-        {
-            List<String> codes = Arrays.asList(CodeEnum.LHC_CODE_NUMBER.getCodes());
-            //彩票号码个数
-            int size = 7;
-            //号码重复
-            boolean repeat = true;
-            //号码是否排序
-            boolean sort = false;
-            return buildPeriodResult(codes, size, repeat, sort);
-        });
     }
 
 
@@ -443,7 +456,72 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
     }
 
     @Override
-    public void doSettle(LotteryCategoryEnum type, String proxyId, String code) {
+    public PeriodResult doSettle(LotteryCategoryEnum type, String proxyId, String periodId, String result, Map<String,JSONArray> configMaps) {
+        PeriodResult periodResult = new PeriodResult();
+        BigDecimal totalPrizeMoney = BigDecimal.ZERO;
+        BigDecimal totalOrderMoney = BigDecimal.ZERO;
+        OrderInfo queryOrder = new OrderInfo();
+        queryOrder.setProxyId(proxyId);
+        queryOrder.setPayStatus(YesOrNoEnum.YES.getValue());
+        queryOrder.setSettleStatus(YesOrNoEnum.NO.getValue());
+        queryOrder.setLotteryType(type.getValue());
+        Page<OrderInfo> orderPage = orderService.queryByPage(queryOrder, PageRequest.of(0, 200));
+
+        List<OrderInfo> allOrder = new ArrayList<>();
+        while (orderPage != null && orderPage.hasContent()) {
+            allOrder.addAll(orderPage.getContent());
+            if (orderPage.hasNext()) {
+                orderPage = orderService.queryByPage(queryOrder, orderPage.nextPageable());
+            } else {
+                orderPage = null;
+            }
+        }
+        for (OrderInfo info : allOrder) {
+            totalOrderMoney = totalOrderMoney.add(info.getOrderMoney());
+            IPlayType play = OrderSplitTools.getPlay(type, info.getPlayType());
+            OrderInfo upEntity = new OrderInfo();
+            upEntity.setId(info.getId());
+            BigDecimal totalMoney = BigDecimal.ZERO;
+            JSONArray jsonObject = configMaps.get(info.getPlayType());
+            List<OrderDetail> orderDetails = orderDetailService.queryByOrderInfoId(info.getId());
+            for (OrderDetail detail : orderDetails) {
+                List<TicketInfo> tickets = detail.getTickets();
+                for (TicketInfo ticketItem : tickets) {
+                    if (checkPrize(ticketItem, result, play)) {
+                        double rate = buildRate(jsonObject, info.getPlayType(), ticketItem);
+                        Integer times = ticketItem.getTimes();
+                        BigDecimal multiply = BigDecimal.valueOf(times).multiply(BigDecimal.valueOf(rate));
+                        totalMoney.add(multiply);
+                        ticketItem.setPrize(true);
+                    }
+                }
+                OrderDetail upDetail = new OrderDetail();
+                upDetail.setId(detail.getId());
+                if (totalMoney.compareTo(BigDecimal.ZERO) > 0) {
+                    upEntity.setStatus(YesOrNoEnum.YES.getValue());
+                    BigDecimal profileMoney = totalMoney.subtract(info.getOrderMoney());
+                    upEntity.setProfileMoney(profileMoney);
+                } else {
+                    upDetail.setStatus(YesOrNoEnum.NO.getValue());
+                }
+                upDetail.setStatus(YesOrNoEnum.YES.getValue());
+                upDetail.setOrderMoney(totalMoney);
+                upEntity.setSettleStatus(YesOrNoEnum.YES.getValue());
+                orderDetailService.save(upDetail);
+            }
+            upEntity.setMoney(totalMoney);
+            upEntity.setSettleStatus(YesOrNoEnum.YES.getValue());
+            if (totalMoney.compareTo(BigDecimal.ZERO) > 0) {
+                upEntity.setStatus(YesOrNoEnum.YES.getValue());
+                BigDecimal profileMoney = totalMoney.subtract(info.getOrderMoney());
+                upEntity.setProfileMoney(profileMoney);
+            }
+            totalPrizeMoney = totalPrizeMoney.add(totalMoney);
+            up(upEntity);
+        }
+        periodResult.setPrizeMoney(totalPrizeMoney);
+        periodResult.setOrderMoney(totalOrderMoney);
+        return periodResult;
     }
 
     @Override
@@ -451,6 +529,21 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         LotteryPeriod period = new LotteryPeriod();
         period.setLotteryType(category.getValue());
         period.setProxyId(proxyId);
+        Page<LotteryPeriod> lotteryPeriods = queryByPage(period, PageRequest.of(0, 1));
+        if (lotteryPeriods.hasNext()) {
+            return lotteryPeriods.getContent().get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public LotteryPeriod findLastNotOpenResult(LotteryCategoryEnum category, String proxyId) {
+        LotteryPeriod period = new LotteryPeriod();
+        period.setLotteryType(category.getValue());
+        period.setProxyId(proxyId);
+        period.setOpenStatus(YesOrNoEnum.NO.getValue());
+        period.setOrderColumn("resultDate");
+        period.setOrderType(OrderTypeEnum.ASC);
         Page<LotteryPeriod> lotteryPeriods = queryByPage(period, PageRequest.of(0, 1));
         if (lotteryPeriods.hasNext()) {
             return lotteryPeriods.getContent().get(0);
@@ -477,31 +570,60 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
     }
 
     @Override
-    public void syncAccount(LotteryCategoryEnum type, String proxyId, String code) {
+    public void dispatchPeriod(LotteryCategoryEnum type, String proxyId, String periodId) {
+        OrderInfo queryOrder = new OrderInfo();
+        queryOrder.setProxyId(proxyId);
+        queryOrder.setPeriodId(periodId);
+        queryOrder.setStatus(YesOrNoEnum.YES.getValue());
+        queryOrder.setSettleStatus(YesOrNoEnum.YES.getValue());
+        queryOrder.setAccountStatus(YesOrNoEnum.NO.getValue());
+        queryOrder.setLotteryType(type.getValue());
+        Page<OrderInfo> orderPage = orderService.queryByPage(queryOrder, PageRequest.of(0, 200));
+
+        List<OrderInfo> allOrder = new ArrayList<>();
+        while (orderPage != null && orderPage.hasContent()) {
+            allOrder.addAll(orderPage.getContent());
+            if (orderPage.hasNext()) {
+                orderPage = orderService.queryByPage(queryOrder, orderPage.nextPageable());
+            } else {
+                orderPage = null;
+            }
+        }
+        boolean error = false;
+        for (OrderInfo info : allOrder) {
+            if (info.getStatus() == YesOrNoEnum.YES.getValue().intValue()) {
+                InvokeBizDto dto = new InvokeBizDto();
+                dto.setProxyId(info.getProxyId());
+                dto.setBizId(info.getId() + "pc");
+                dto.setSubBiz("派彩");
+                dto.setPin(info.getPin());
+                dto.setOperator("system");
+                dto.setTokenType(TokenType);
+                dto.setAmount(info.getMoney());
+                dto.setRemark("派彩");
+                RPCResult<BigDecimal> invoke = accountRPCService.invoke(dto);
+                if (invoke.getSuccess()) {
+                    OrderInfo upOrder = new OrderInfo();
+                    upOrder.setId(info.getId());
+                    upOrder.setAccountStatus(YesOrNoEnum.YES.getValue());
+                    orderService.save(upOrder);
+                } else {
+                    error = true;
+                }
+            }
+        }
+
+        if (error) {
+            return;
+        }
+
         Query query = new Query();
-        Criteria criteria = Criteria.where("proxyId").is(proxyId).and("code").is(code);
+        Criteria criteria = Criteria.where("id").is(periodId).and("dispatchStatus").is(YesOrNoEnum.NO.getValue());
         query.addCriteria(criteria);
         String collectionName = getCollectionName(type, proxyId);
-        List<LotteryPeriod> list = secondaryTemplate.find(query, getEntityClass(), collectionName);
-        LotteryPeriod period = list.get(0);
-
-        if (StringUtils.isNotBlank(period.getResult())) {
-            throw new ApplicationException("未生成开奖结果");
-        }
-        if (YesOrNoEnum.YES.getValue().intValue() != period.getOpenStatus()) {
-            throw new ApplicationException("不在开奖状态");
-        }
-
-        OrderInfo orderInfo = new OrderInfo();
-        orderInfo.setPeriodId(period.getId());
-
-
-//        orderService.queryByPage()
-
-
         //设置结算状态
         Update update = new Update();
-        update.set("settleStatus", YesOrNoEnum.YES.getValue());
+        update.set("dispatchStatus", YesOrNoEnum.YES.getValue());
         primaryTemplate.updateFirst(query, update, getEntityClass(), collectionName);
     }
 
@@ -513,6 +635,10 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         String collectionName = getCollectionName(category, proxyId);
         Query query = new Query();
         MongoTemplate template = secondaryTemplate;
+        if (StringUtils.isBlank(period.getId())) {
+            Criteria criteria = Criteria.where("id").is(period.getId());
+            query.addCriteria(criteria);
+        }
         //派奖状态
         if (period.getDispatchStatus() != null) {
             Criteria criteria = Criteria.where("dispatchStatus").is(period.getDispatchStatus());

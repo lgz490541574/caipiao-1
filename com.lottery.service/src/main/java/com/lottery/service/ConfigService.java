@@ -4,6 +4,7 @@ import com.common.mongo.MongoService;
 import com.lottery.domain.Config;
 import com.lottery.domain.model.LotteryCategoryEnum;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,5 +49,12 @@ public interface ConfigService extends MongoService<Config> {
    * @return
    */
   public Map<String, Object> getPlayTypeDetail(String proxyId, LotteryCategoryEnum lottery,String playType);
+
+
+  /**
+   * 查询所有
+   * @return
+   */
+  List<Config> queryAll();
 
 }

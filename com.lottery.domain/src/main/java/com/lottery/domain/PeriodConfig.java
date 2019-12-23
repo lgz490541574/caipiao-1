@@ -35,15 +35,11 @@ public class PeriodConfig extends AbstractBaseEntity {
      */
     private BigDecimal maxLossMoney;
     /**
-     * 配置状态  1 盈利模式  2 亏损模式  3 随机模式
+     * 配置状态  1 盈利模式  2 亏损模式 3 随机模式
      */
     private Integer status;
     /**
      * 盈利  权重  例如：4  满值为10  则表示  40%盈利几率  为 10 则为100%盈利  只在随机模式生效
      */
     private Integer weight;
-    /**
-     * 智能权重  1 是  2  否
-     */
-    private Integer weightStatus;
 }

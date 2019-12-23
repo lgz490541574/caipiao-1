@@ -1,6 +1,5 @@
 package com.lottery.service.dto;
 
-import com.lottery.domain.model.LotteryCategoryEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;

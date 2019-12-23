@@ -7,7 +7,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -27,19 +26,16 @@ public class LotteryPeriod extends AbstractBaseEntity {
      */
     @Transient
     private Integer lotteryType;
-
     /**
      * 是否私彩
      */
     @Transient
     private Integer privateLottery;
-
     /**
      * 代理商标识
      */
     @Transient
     private String proxyId;
-
     /**
      * 期号
      */
@@ -55,13 +51,15 @@ public class LotteryPeriod extends AbstractBaseEntity {
      */
     private Date resultDate;
 
+    /**
+     * 开奖时间文本
+     */
     private String resultDateStr;
 
     /**
      * 是否开奖 1 开奖 2否
      */
     private Integer openStatus;
-
     /**
      * 是否结算
      */
@@ -70,26 +68,10 @@ public class LotteryPeriod extends AbstractBaseEntity {
      * 下注截止时间
      */
     private Date endOrderTime;
-
     /**
      * 派彩状态
      */
     private Integer dispatchStatus;
-
-
-    /**
-     * 小于下注截止时间
-     */
-    @Transient
-    @QueryField(name = "endOrderTime", type = QueryType.LTE)
-    private Date minEndOrderTime;
-
-    /**
-     * 大于下注截止时间
-     */
-    @Transient
-    @QueryField(name = "endOrderTime", type = QueryType.GTE)
-    private Date maxEndOrderTime;
 
     /**
      * 该期号总下注金额
@@ -102,7 +84,11 @@ public class LotteryPeriod extends AbstractBaseEntity {
     /**
      * 盈利金额
      */
-    private BigDecimal subtract;
+    private BigDecimal profileMoney;
+    /**
+     * 盈利率
+     */
+    private BigDecimal rate;
     /**
      * 预生成开奖结果号码
      */
@@ -111,4 +97,17 @@ public class LotteryPeriod extends AbstractBaseEntity {
      * 开奖方式  1 预生成号码开奖  2 自动开奖
      */
     private Integer resultStatus;
+    /**
+     * 小于下注截止时间
+     */
+    @Transient
+    @QueryField(name = "endOrderTime", type = QueryType.LTE)
+    private Date minEndOrderTime;
+    /**
+     * 大于下注截止时间
+     */
+    @Transient
+    @QueryField(name = "endOrderTime", type = QueryType.GTE)
+    private Date maxEndOrderTime;
+
 }

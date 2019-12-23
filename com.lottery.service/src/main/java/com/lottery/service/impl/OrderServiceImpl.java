@@ -21,6 +21,8 @@ import com.lottery.service.OrderDetailService;
 import com.lottery.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Reference;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +54,6 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         return OrderInfo.class;
     }
 
-
     private void createDetail(String orderInfoId, LotteryCategoryEnum lotteryCategory, String playType, String periodCode, List<TicketInfo> tickets, Integer times) {
         OrderDetail detail = new OrderDetail();
         detail.setOrderInfoId(orderInfoId);
@@ -65,11 +66,13 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         orderDetailService.insert(detail);
     }
 
-
-    @Override
-    public void doSettle(List<OrderInfo> orderList, String result) {
-
+    private void delDetailByOrderInfoId(String orderInfoId){
+        Query query = new Query();
+        Criteria criteria = Criteria.where("orderInfoId").is(orderInfoId);
+        query.addCriteria(criteria);
+        primaryTemplate.remove(query,OrderDetail.class);
     }
+
 
     /**
      * 下单
@@ -129,7 +132,6 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
             throw new BizException("order.error", "网络错误,请稍后再试");
         }
 
-
         OrderInfo order = new OrderInfo();
 
         order.setPin(pin);
@@ -185,12 +187,11 @@ public class OrderServiceImpl extends AbstractMongoService<OrderInfo> implements
         }
         //账户余额不足
         if (!payResult.getSuccess() && payResult.getCode().equals("account.not.enough")) {
+            delById(order.getId());
+            delDetailByOrderInfoId(order.getId());
             throw new BizException(payResult.getCode(), payResult.getMessage());
         }
         log.error("order.pay.error code={},message={}", new String[]{payResult.getCode(), payResult.getMessage()});
         throw new BizException("order.error", "网络错误，请稍后再试");
-
     }
-
-
 }

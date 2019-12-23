@@ -1,8 +1,8 @@
 package com.lottery.main.controller;
 
 import com.common.annotation.RoleResource;
+import com.common.exception.BizException;
 import com.common.util.BeanCoper;
-import com.common.util.StringUtils;
 import com.lottery.domain.Config;
 import com.lottery.main.AbstractClientController;
 import com.lottery.main.controller.dto.ConfigDto;
@@ -37,9 +37,6 @@ public class ConfigController extends AbstractClientController {
         return buildMessage(() -> {
             Config entity = new Config();
             BeanCoper.copyProperties(entity, info);
-            if (StringUtils.isBlank(entity.getGameType())) {
-                entity.setGameType(null);
-            }
             List<Config> configs = configService.query(entity);
             return configs;
         });
@@ -47,7 +44,6 @@ public class ConfigController extends AbstractClientController {
 
     /**
      * 查询
-     *
      * @param params
      * @return
      */
@@ -56,6 +52,9 @@ public class ConfigController extends AbstractClientController {
     public Map<String, Object> view(@RequestBody Map<String, Object> params) {
         return buildMessage(() -> {
             Config byId = configService.findById((String) params.get("id"));
+            if (!byId.getProxyId().equalsIgnoreCase(getUser().getProxyId())) {
+                throw new BizException("data.error", "非法操作");
+            }
             return byId;
         });
     }

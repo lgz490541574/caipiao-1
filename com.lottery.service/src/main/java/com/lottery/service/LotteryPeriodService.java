@@ -1,16 +1,18 @@
 package com.lottery.service;
 
-import com.common.util.model.YesOrNoEnum;
 import com.lottery.domain.Config;
 import com.lottery.domain.LotteryPeriod;
 import com.lottery.domain.OrderInfo;
+import com.lottery.domain.PeriodConfig;
 import com.lottery.domain.model.LotteryCategoryEnum;
 import com.lottery.service.dto.PeriodResult;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface LotteryPeriodService {
 
@@ -50,21 +52,20 @@ public interface LotteryPeriodService {
 
     /**
      * 结算
-     *
      * @param type
      * @param proxyId
-     * @param code
+     * @param periodId
+     * @param result 开奖号码
      */
-    void doSettle(LotteryCategoryEnum type, String proxyId, String code);
+    PeriodResult doSettle(LotteryCategoryEnum type, String proxyId, String periodId, String result, Map<String, JSONArray> configArray);
 
     /**
      * 派彩
-     *
      * @param type
      * @param proxyId
-     * @param code
+     * @param periodId
      */
-    void syncAccount(LotteryCategoryEnum type, String proxyId, String code);
+    void dispatchPeriod(LotteryCategoryEnum type, String proxyId, String periodId);
 
     /**
      * 查找最后一彩期
@@ -73,6 +74,15 @@ public interface LotteryPeriodService {
      * @return
      */
     LotteryPeriod findLast(LotteryCategoryEnum category,String proxyId);
+
+
+    /**
+     * 查询最后一期未开奖彩期
+     * @param category
+     * @param proxyId
+     * @return
+     */
+    LotteryPeriod findLastNotOpenResult(LotteryCategoryEnum category, String proxyId);
 
     /**
      * 查询彩期
@@ -119,5 +129,14 @@ public interface LotteryPeriodService {
      * @param configs
      * @return
      */
-    List<PeriodResult> caculateResult(LotteryCategoryEnum lotteryType, List<OrderInfo> orderList, List<Config> configs);
+    List<PeriodResult> caculateResult(LotteryCategoryEnum lotteryType, List<OrderInfo> orderList, Map<String, JSONArray> configs);
+
+    /**
+     * 开奖
+     * @param periodConfig
+     * @param countList
+     * @param category
+     * @return
+     */
+    PeriodResult getBestRatePeriodCode(PeriodConfig periodConfig, List<PeriodResult> countList, LotteryCategoryEnum category);
 }

@@ -1,7 +1,9 @@
 package com.lottery.service.impl;
 
+import com.common.exception.BizException;
 import com.common.mongo.AbstractMongoService;
 import com.common.util.RPCResult;
+import com.common.util.model.OrderTypeEnum;
 import com.lottery.domain.Config;
 import com.lottery.domain.model.LotteryCategoryEnum;
 import com.lottery.domain.util.IPlayType;
@@ -11,10 +13,14 @@ import com.passport.rpc.ProxyInfoRPCService;
 import com.passport.rpc.dto.ProxyDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Reference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +58,7 @@ public class ConfigServiceImpl extends AbstractMongoService<Config> implements C
             }
         }
         IPlayType playTypes = (IPlayType) currentType;
-        TicketRule[] ticketRules =playTypes.getRules();
+        TicketRule[] ticketRules = playTypes.getRules();
         return null;
     }
 
@@ -64,14 +70,10 @@ public class ConfigServiceImpl extends AbstractMongoService<Config> implements C
         if (query == null) {
             query = new Config();
             query.setKey(key);
-            query.setName(name);
             query.setContent(content);
-            query.setRemark(remark);
         } else {
             query.setKey(key);
-            query.setName(name);
             query.setContent(content);
-            query.setRemark(remark);
         }
         save(query);
     }
@@ -95,31 +97,33 @@ public class ConfigServiceImpl extends AbstractMongoService<Config> implements C
 
     @Override
     public void saveOrUpdate(Config config) {
-        if (config.getId() == null) {
-            RPCResult<List<ProxyDto>> listRPCResult = proxyRpcService.queryAll();
-            for (ProxyDto dto : listRPCResult.getData()) {
-                String name = dto.getName();
-                Config cfg = new Config();
-                cfg.setProxyId(dto.getId());
-                cfg.setGameType(config.getGameType());
-                cfg.setKey(config.getKey());
-                if (findByOne(cfg) != null) {
-                    continue;
-                }
-                cfg.setContent(config.getContent());
-                if (config.getKey().contains("DSH")) {
-                    String cfgName = config.getName().replaceAll("九州", name);
-                    cfg.setName(cfgName);
-                } else {
-                    cfg.setName(config.getName());
-                }
-                cfg.setRemark(config.getRemark());
-                cfg.setCodeLimit(config.getCodeLimit());
-                save(cfg);
+        if (config.getId() != null) {
+            Config oldData = findById(config.getId());
+            if(!config.getProxyId().equals(oldData.getProxyId())){
+                throw new BizException("data.error","非法操作");
             }
+            save(config);
         } else {
-            up(config);
+            insert(config);
         }
+    }
+
+    @Override
+    public List<Config> queryAll() {
+        List<Config> allConfig = new ArrayList<>();
+        Config configQuery = new Config();
+        configQuery.setOrderColumn("createTime");
+        configQuery.setOrderType(OrderTypeEnum.ASC);
+        Page<Config> configs = queryByPage(configQuery, PageRequest.of(0, 100));
+        while (configs != null && configs.hasNext()) {
+            allConfig.addAll(configs.getContent());
+            if (configs.hasNext()) {
+                configs = queryByPage(configQuery, configs.nextPageable());
+            } else {
+                configs = null;
+            }
+        }
+        return allConfig;
     }
 
     @Override

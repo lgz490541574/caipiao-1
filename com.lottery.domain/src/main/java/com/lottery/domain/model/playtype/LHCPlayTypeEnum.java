@@ -13,7 +13,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
     /**
      * 香港六合彩  特码直选
      */
-    TM_ZX("特码直选",
+    TM_ZX("特码-直选",
             new AbstractPrizeCheck() {
                 @Override
                 public boolean isPrize(String issueResult, String code) {
@@ -43,9 +43,9 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
                     new TicketRule("", CodeEnum.LHC_CODE_NUMBER.getCodes())
             }),
     /**
-     * 香港六合彩  特码两面
+     * 香港六合彩  两面
      */
-    TM_LM( "特码两面",
+    LM( "特码-两面",
             new AbstractPrizeCheck() {
                 @Override
                 public boolean isPrize(String issueResult, String code) {
@@ -63,7 +63,7 @@ public enum LHCPlayTypeEnum implements IGlossary, IPlayType {
             new AbstractValidateOrder() {
                 @Override
                 public boolean checkTicketCode(String ticketCode) {
-                    TicketRule[] ticketRules = TM_LM.rules;
+                    TicketRule[] ticketRules = LM.rules;
                     for (String item : ticketRules[0].getValues()) {
                         if (item.equals(ticketCode)) {
                             return true;

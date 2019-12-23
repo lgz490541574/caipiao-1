@@ -24,12 +24,4 @@ public interface OrderService extends MongoService<OrderInfo> {
      */
     BigDecimal createOrder(String proxyId, String pin, LotteryCategoryEnum type, String playType, String periodId, List<String[]> codes, Integer times, String chaseMark, YesOrNoEnum prizeStop);
 
-
-    /**
-     * 结算
-     *
-     * @param orderList
-     * @param result
-     */
-    void doSettle(List<OrderInfo> orderList, String result);
 }

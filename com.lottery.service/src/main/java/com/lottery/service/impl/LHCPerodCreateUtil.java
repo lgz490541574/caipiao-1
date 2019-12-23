@@ -48,7 +48,7 @@ public class LHCPerodCreateUtil {
         String day = DateUtil.formatYYYYMMDD(new Date());
         //判断数据是否已经存在
         PeriodDayLog periodDayLog = periodDayLogService.findByCategoryAndDay(LotteryCategoryEnum.LHC_XG, day);
-        if (periodDayLog != null && periodDayLog.getErrorStatus().intValue() == YesOrNoEnum.NO.getValue()) {
+        if (periodDayLog != null && periodDayLog.getErrorStatus().intValue() == YesOrNoEnum.NO.getValue().intValue()) {
             return;
         }
         LotteryCategoryEnum category = LotteryCategoryEnum.LHC_XG;
