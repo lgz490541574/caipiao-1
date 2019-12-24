@@ -12,12 +12,14 @@ import com.lottery.proxy.AbstractClientController;
 import com.lottery.proxy.controller.dto.ConfigDto;
 import com.lottery.service.ConfigService;
 import com.lottery.service.OrderService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -36,13 +38,12 @@ public class ConfigController extends AbstractClientController {
      */
     @RoleResource(resource = "lottery")
     @RequestMapping("/config/list")
-    public Map<String, Object> list(@RequestBody ConfigDto dto) {
-        return buildMessage(() -> {
-            Config entity = new Config();
-            BeanCoper.copyProperties(entity, dto);
-            dto.setPorxyId(getUser().getProxyId());
-            return configService.queryByPage(entity,dto.getPageinfo().getPage());
-        });
+    public Page<ConfigDto> list(@RequestBody ConfigDto dto) {
+        Config entity = new Config();
+        BeanCoper.copyProperties(entity, dto);
+        dto.setPorxyId(getUser().getProxyId());
+        Page<Config> configs = configService.queryByPage(entity, dto.getPageinfo().getPage());
+        return BeanCoper.copyPage(ConfigDto.class, configs);
     }
 
     /**

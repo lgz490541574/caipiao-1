@@ -60,7 +60,7 @@ public class LotteryResultUtils {
         item.put("proxyId", proxyId);
         item.put("code", code);
         item.put("result", result);
-        rocketMQTemplate.convertAndSend("lottery-open", item.toString());
+        rocketMQTemplate.convertAndSend("lottery-open-topic", item.toString());
     }
 
     private void doSyncData(LotteryCategoryEnum category, String code) {

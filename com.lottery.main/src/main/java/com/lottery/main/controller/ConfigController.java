@@ -33,17 +33,16 @@ public class ConfigController extends AbstractClientController {
      */
     @RoleResource(resource = "lottery")
     @RequestMapping("/config/list")
-    public Map<String, Object> list(@RequestBody ConfigDto info) {
-        return buildMessage(() -> {
-            Config entity = new Config();
-            BeanCoper.copyProperties(entity, info);
-            List<Config> configs = configService.query(entity);
-            return configs;
-        });
+    public List<Config> list(@RequestBody ConfigDto info) {
+        Config entity = new Config();
+        BeanCoper.copyProperties(entity, info);
+        List<Config> configs = configService.query(entity);
+        return configs;
     }
 
     /**
      * 查询
+     *
      * @param params
      * @return
      */
