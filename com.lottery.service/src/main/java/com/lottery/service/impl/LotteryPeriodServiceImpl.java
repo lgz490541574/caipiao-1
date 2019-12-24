@@ -101,12 +101,12 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         buildIndex(primaryTemplate.getCollectionName(getEntityClass()));
         //快三生成结果
         resultBuilderMap.put(LotteryCategoryEnum.KS, () -> {
-            List<String> ksCodes = Arrays.asList(CodeEnum.KS_CODE_NUMBER.getCodes());
+            List<String> ksCodes = new ArrayList<>(Arrays.asList(CodeEnum.KS_CODE_NUMBER.getCodes()));
             return buildPeriodResult(ksCodes, 3, false, true);
         });
         //时时彩生成结果
         resultBuilderMap.put(LotteryCategoryEnum.SSC, () -> {
-            List<String> sscCodes = Arrays.asList(CodeEnum.SSC_CODE_NUMBER.getCodes());
+            List<String> sscCodes = new ArrayList<>(Arrays.asList(CodeEnum.SSC_CODE_NUMBER.getCodes()));
             //彩票号码个数
             int size = 5;
             //号码重复
@@ -117,7 +117,7 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         });
         //pk10生成结果
         resultBuilderMap.put(LotteryCategoryEnum.PK10, () -> {
-            List<String> codes = Arrays.asList(CodeEnum.PK10_CODE_NUMBER.getCodes());
+            List<String> codes =new ArrayList<>(Arrays.asList(CodeEnum.PK10_CODE_NUMBER.getCodes()));
             //彩票号码个数
             int size = 10;
             //号码重复
@@ -128,11 +128,22 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         });
         //六合彩生成结果
         resultBuilderMap.put(LotteryCategoryEnum.LHC, () -> {
-            List<String> codes = Arrays.asList(CodeEnum.LHC_CODE_NUMBER.getCodes());
+            List<String> codes = new ArrayList<>(Arrays.asList(CodeEnum.LHC_CODE_NUMBER.getCodes()));
             //彩票号码个数
             int size = 7;
             //号码重复
             boolean repeat = true;
+            //号码是否排序
+            boolean sort = false;
+            return buildPeriodResult(codes, size, repeat, sort);
+        });
+        //十一选五
+        resultBuilderMap.put(LotteryCategoryEnum.SYX5,()->{
+            List<String> codes = new ArrayList<>(Arrays.asList(CodeEnum.SYXW_NUMBER.getCodes()));
+            //彩票号码个数
+            int size = 5;
+            //号码重复
+            boolean repeat = false;
             //号码是否排序
             boolean sort = false;
             return buildPeriodResult(codes, size, repeat, sort);
@@ -267,19 +278,33 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
      */
     public List<PeriodResult> caculateResult(LotteryCategoryEnum lotteryType, List<OrderInfo> orderList, Map<String,JSONArray> configs) {
         List<PeriodResult> resultCaculate = new ArrayList<>();
-
+        LotteryCategoryEnum rootLottery=lotteryType;
+        if(rootLottery.getParent()!=null){
+            rootLottery=rootLottery.getParent();
+        }
 
         List<String> resultList = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
-            resultList.add(resultBuilderMap.get(lotteryType).buildResult());
+            if(orderList.size()==0){
+                String result = resultBuilderMap.get(rootLottery).buildResult();
+                PeriodResult resultItem = new PeriodResult();
+                resultItem.setResult(result);
+                resultItem.setOrderMoney(BigDecimal.ZERO);
+                resultItem.setPrizeMoney(BigDecimal.ZERO);
+                resultItem.setProfileMoney(BigDecimal.ZERO);
+                resultItem.setRate(BigDecimal.ZERO);
+                resultCaculate.add(resultItem);
+                return resultCaculate;
+            }
+            resultList.add(resultBuilderMap.get(rootLottery).buildResult());
         }
         for (String result : resultList) {
             BigDecimal totalPrizeMoney = BigDecimal.ZERO;
             BigDecimal totalOrderMoney = BigDecimal.ZERO;
 
             for (OrderInfo info : orderList) {
-                IPlayType play = OrderSplitTools.getPlay(lotteryType, info.getPlayType());
-                List<TicketInfo> tickets = play.getOrderSplit().doSplit(lotteryType, info.getPlayType());
+                IPlayType play = OrderSplitTools.getPlay(rootLottery, info.getPlayType());
+                List<TicketInfo> tickets = play.getOrderSplit().doSplit(rootLottery, info.getPlayType());
                 JSONArray jsonObject = configs.get(info.getPlayType());
                 for (TicketInfo ticketItem : tickets) {
                     if (checkPrize(ticketItem, result, play)) {
@@ -330,18 +355,18 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         double rate = 0;
         if (jsonObject.size() == 1) {
             //所有号码赔率
-            rate = JSONObject.fromObject(jsonObject.get(0)).getDouble("rate");
+            rate = JSONObject.fromObject(jsonObject.get(0)).getDouble("code");
         } else {
             //特殊賠率
             if (StringUtils.isNotBlank(type)) {
                 Integer index = Integer.parseInt(type) - 2;
-                rate = JSONObject.fromObject(jsonObject.get(index)).getDouble("rate");
+                rate = JSONObject.fromObject(jsonObject.get(index)).getDouble("code");
             } else {
                 //单值赔率
                 for (int m = 0; m < jsonObject.size(); m++) {
                     JSONObject obj = JSONObject.fromObject(jsonObject.get(m));
                     if (item.getTicketCode().equals(obj.getString("code"))) {
-                        rate = obj.getDouble("rate");
+                        rate = obj.getDouble("code");
                         break;
                     }
                 }

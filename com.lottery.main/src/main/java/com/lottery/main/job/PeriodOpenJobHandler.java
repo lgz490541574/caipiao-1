@@ -90,24 +90,23 @@ public class PeriodOpenJobHandler extends IJobHandler {
         Map<LotteryCategoryEnum, Map<String, JSONArray>> allConfig = new HashMap<>();
 
         List<Config> configs = configService.queryAll();
-        for(LotteryCategoryEnum category:LotteryCategoryEnum.values()){
-            if(category.getParent()!=null){
+        for (LotteryCategoryEnum category : LotteryCategoryEnum.values()) {
+            if (category.getParent() != null) {
                 continue;
             }
-            Map<String, JSONArray> lotteryCfg=null;
-            lotteryCfg=allConfig.get(category.name());
-            if(lotteryCfg==null){
-                lotteryCfg= new HashMap<>();
+            Map<String, JSONArray> lotteryCfg = null;
+            lotteryCfg = allConfig.get(category.name());
+            if (lotteryCfg == null) {
+                lotteryCfg = new HashMap<>();
             }
-            for(Config cfg:configs){
-                if(cfg.getLotteryType().equals(category.name())){
-                    lotteryCfg.put(cfg.getKey(),JSONArray.fromObject(cfg.getContent()));
-                }
-                else{
+            for (Config cfg : configs) {
+                if (cfg.getLotteryType().equals(category.name())) {
+                    lotteryCfg.put(cfg.getKey(), JSONArray.fromObject(cfg.getContent()));
+                } else {
                     continue;
                 }
             }
-            allConfig.put(category,lotteryCfg);
+            allConfig.put(category, lotteryCfg);
         }
         for (ProxyDto dto : list) {
             executor.execute(() -> {
@@ -135,13 +134,21 @@ public class PeriodOpenJobHandler extends IJobHandler {
                             int count = 0;
                             while (true) {
                                 try {
+                                    PeriodResult bestRatePeriodCode = null;
                                     List<PeriodResult> resultList = lotteryPeriodService.caculateResult(category, orders, allConfig.get(category));
-                                    PeriodResult bestRatePeriodCode = lotteryPeriodService.getBestRatePeriodCode(proxyPeriodConfigs.get(dto.getId()), resultList, category);
+                                    if (orders.size() > 0) {
+                                        bestRatePeriodCode = lotteryPeriodService.getBestRatePeriodCode(proxyPeriodConfigs.get(dto.getId()), resultList, category);
+                                    } else {
+                                        bestRatePeriodCode = resultList.get(0);
+                                    }
                                     LotteryPeriod period = new LotteryPeriod();
+                                    period.setLotteryType(category.getValue());
                                     period.setId(lotteryResult.getId());
                                     period.setResult(bestRatePeriodCode.getResult());
                                     period.setOpenStatus(YesOrNoEnum.YES.getValue());
+                                    period.setProxyId(dto.getId());
                                     lotteryPeriodService.save(period);
+                                    lotteryResultUtils.pushResultToMq(category, period.getProxyId(), lotteryResult.getCode(), bestRatePeriodCode.getResult());
                                     break;
                                 } catch (PreBuildPeriodException e) {
                                     count++;

@@ -43,6 +43,7 @@ public class LotteryResultUtils {
     public static void main(String[] args) {
 
     }
+
     private String lotteryOpenKey = "lottery.period.open.{0}.type.{1}.proxy.{2}";
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -50,30 +51,16 @@ public class LotteryResultUtils {
     @Autowired(required = false)
     private RocketMQTemplate rocketMQTemplate;
 
-    private void pushResultToMq(LotteryCategoryEnum category, String proxyId, String code, String result) {
-        try {
-            stringRedisTemplate.setEnableTransactionSupport(true);
-            stringRedisTemplate.multi();
-            if (StringUtils.isBlank(proxyId)) {
-                proxyId = "";
-            }
-            String key = MessageFormat.format(lotteryOpenKey, category.getValue(), proxyId);
-            stringRedisTemplate.opsForValue().increment(key, 1);
-            stringRedisTemplate.expire(key, 1, TimeUnit.MINUTES);
-            stringRedisTemplate.exec();
-            Long increment = stringRedisTemplate.opsForValue().increment(key, 1);
-            if (increment == 2) {
-                JSONObject item=new JSONObject();
-                item.put("type",category.getValue());
-                item.put("proxyId",proxyId);
-                item.put("code",code);
-                item.put("result",result);
-                rocketMQTemplate.convertAndSend("lottery-open", item.toString());
-            }
-        } catch (Exception e) {
-            log.error("LotteryResultUtils.pushResultTomq", e);
-            stringRedisTemplate.discard();
+    public void pushResultToMq(LotteryCategoryEnum category, String proxyId, String code, String result) {
+        if (StringUtils.isBlank(proxyId)) {
+            proxyId = "";
         }
+        JSONObject item = new JSONObject();
+        item.put("type", category.getValue());
+        item.put("proxyId", proxyId);
+        item.put("code", code);
+        item.put("result", result);
+        rocketMQTemplate.convertAndSend("lottery-open", item.toString());
     }
 
     private void doSyncData(LotteryCategoryEnum category, String code) {
@@ -339,7 +326,7 @@ public class LotteryResultUtils {
                 upEntity.setOpenStatus(YesOrNoEnum.YES.getValue());
                 upEntity.setLotteryType(category.getValue());
                 upEntity.setResult(resultCode);
-                pushResultToMq(category,period.getProxyId(),period.getCode(),resultCode);
+                pushResultToMq(category, period.getProxyId(), period.getCode(), resultCode);
                 lotteryPeriodService.save(upEntity);
                 return;
             }

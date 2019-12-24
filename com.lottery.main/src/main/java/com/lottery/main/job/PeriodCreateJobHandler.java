@@ -36,8 +36,6 @@ public class PeriodCreateJobHandler extends IJobHandler {
     private PeriodDayLogService periodDayLogService;
     @Resource
     private IssureCreateUtils issureCreateUtils;
-
-
     @Resource
     private Executor executor;
 
