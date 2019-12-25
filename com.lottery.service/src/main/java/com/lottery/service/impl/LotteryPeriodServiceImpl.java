@@ -470,14 +470,10 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         update.set("result", result);
         update.set("openStatus", YesOrNoEnum.YES.getValue());
         UpdateResult updateResult = primaryTemplate.updateMulti(query, update, getEntityClass(), getCollectionName(category, proxyId));
-        if (updateResult.getMatchedCount() == 0) {
+        if (updateResult.getMatchedCount() == 1) {
             return true;
         }
-        if (updateResult.getModifiedCount() != 1) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     @Override

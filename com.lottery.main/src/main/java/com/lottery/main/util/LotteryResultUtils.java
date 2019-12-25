@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -76,10 +77,18 @@ public class LotteryResultUtils {
             lotteryPeriodService.save(upEntity);
             period.setResultDateStr(upEntity.getResultDateStr());
         }
+
         //如果不是六合彩则拉取详情
         if (category != LotteryCategoryEnum.LHC_XG) {
             if (new DateTime(period.getResultDate()).plusMinutes(category.getRule().getLongTime()).toDate().before(DateTime.now().toDate())) {
-                drawPeriodList(category, code);
+                DateTime day = new DateTime(period.getResultDate());
+                String date = "";
+                if (day.plusDays(1).getDayOfYear() == DateTime.now().getDayOfYear()) {
+                    date = DateUtil.formatDateTime(day.toDate(), "yyyy-MM-dd");
+                } else {
+                    date = DateUtil.formatDateTime(new Date(), "yyyy-MM-dd");
+                }
+                drawPeriodList(category, code, date);
                 return;
             }
         }
@@ -95,11 +104,11 @@ public class LotteryResultUtils {
     public void init() {
         //重庆时时彩
         resultUrlMap.put(LotteryCategoryEnum.SSC_CQ, "https://api.api861861.com/CQShiCai/getBaseCQShiCai.do?lotCode=10060");
-        resultListMap.put(LotteryCategoryEnum.SSC_CQ, "https://api.api861861.com/CQShiCai/getBaseCQShiCaiList.do?lotCode=10060");
+        resultListMap.put(LotteryCategoryEnum.SSC_CQ, "https://api.api861861.com/CQShiCai/getBaseCQShiCaiList.do?date={0}&lotCode=10060");
 
         //北京PK10
         resultUrlMap.put(LotteryCategoryEnum.PK10_BJ, "https://api.api861861.com/pks/getLotteryPksInfo.do?lotCode=10001");
-        resultListMap.put(LotteryCategoryEnum.PK10_BJ, "https://api.api861861.com/pks/getPksHistoryList.do?lotCode=10001");
+        resultListMap.put(LotteryCategoryEnum.PK10_BJ, "https://api.api861861.com/pks/getPksHistoryList.do?date={0}&lotCode=10001");
 
         //香港六合彩
         resultUrlMap.put(LotteryCategoryEnum.LHC_XG, "https://1680660.com/smallSix/findSmallSixInfo.do?lotCode=10048");
@@ -107,37 +116,42 @@ public class LotteryResultUtils {
 
         //广东11选五
         resultUrlMap.put(LotteryCategoryEnum.SYX5_GD, "https://api.api861861.com/ElevenFive/getElevenFiveInfo.do?lotCode=10006");
-        resultListMap.put(LotteryCategoryEnum.SYX5_GD, "https://api.api861861.com/ElevenFive/getElevenFiveList.do?date=&lotCode=10006");
+        resultListMap.put(LotteryCategoryEnum.SYX5_GD, "https://api.api861861.com/ElevenFive/getElevenFiveList.do?date={0}&&lotCode=10006");
 
 
         //江西11选五
         resultUrlMap.put(LotteryCategoryEnum.SYX5_JX, "https://api.api861861.com/ElevenFive/getElevenFiveInfo.do?lotCode=10015");
-        resultListMap.put(LotteryCategoryEnum.SYX5_JX, "https://api.api861861.com/ElevenFive/getElevenFiveList.do?date=&lotCode=10015");
+        resultListMap.put(LotteryCategoryEnum.SYX5_JX, "https://api.api861861.com/ElevenFive/getElevenFiveList.do?date={0}&lotCode=10015");
 
         //安徽11选五
         resultUrlMap.put(LotteryCategoryEnum.SYX5_AH, "https://api.api861861.com/ElevenFive/getElevenFiveInfo.do?lotCode=10017");
-        resultListMap.put(LotteryCategoryEnum.SYX5_AH, "https://api.api861861.com/ElevenFive/getElevenFiveList.do?date=&lotCode=10017");
+        resultListMap.put(LotteryCategoryEnum.SYX5_AH, "https://api.api861861.com/ElevenFive/getElevenFiveList.do?date={0}&lotCode=10017");
 
 
         //安徽快三
         resultUrlMap.put(LotteryCategoryEnum.KS_AH, "https://api.api861861.com/lotteryJSFastThree/getBaseJSFastThree.do?lotCode=10030");
-        resultListMap.put(LotteryCategoryEnum.KS_AH, "https://api.api861861.com/lotteryJSFastThree/getJSFastThreeList.do?date=&lotCode=10030");
+        resultListMap.put(LotteryCategoryEnum.KS_AH, "https://api.api861861.com/lotteryJSFastThree/getJSFastThreeList.do?date={0}&lotCode=10030");
 
         //上海11选五
         resultUrlMap.put(LotteryCategoryEnum.SYX5_SH, "https://api.api861861.com/ElevenFive/getElevenFiveInfo.do?lotCode=10018");
-        resultListMap.put(LotteryCategoryEnum.SYX5_SH, "https://api.api861861.com/ElevenFive/getElevenFiveList.do?date=&lotCode=10018");
+        resultListMap.put(LotteryCategoryEnum.SYX5_SH, "https://api.api861861.com/ElevenFive/getElevenFiveList.do?date={0}&lotCode=10018");
 
         //天津时时彩
         resultUrlMap.put(LotteryCategoryEnum.SSC_TJ, "https://api.api861861.com/CQShiCai/getBaseCQShiCai.do?lotCode=10003");
-        resultListMap.put(LotteryCategoryEnum.SSC_TJ, "https://api.api861861.com/CQShiCai/getBaseCQShiCaiList.do?lotCode=10003");
+        resultListMap.put(LotteryCategoryEnum.SSC_TJ, "https://api.api861861.com/CQShiCai/getBaseCQShiCaiList.do?date={0}&lotCode=10003");
 
-        //幸运飞艇
+        //PC蛋蛋幸运28
         resultUrlMap.put(LotteryCategoryEnum.XY28_GW, "https://api.api861861.com/pks/getLotteryPksInfo.do?lotCode=10057");
-        resultListMap.put(LotteryCategoryEnum.XY28_GW, "https://api.api861861.com/pks/getPksHistoryList.do?lotCode=10057");
+        resultListMap.put(LotteryCategoryEnum.XY28_GW, "https://api.api861861.com/pks/getPksHistoryList.do?date={0}&lotCode=10057");
 
         //新疆时时彩
         resultUrlMap.put(LotteryCategoryEnum.SSC_XJ, "https://api.api861861.com/CQShiCai/getBaseCQShiCai.do?lotCode=10004");
-        resultListMap.put(LotteryCategoryEnum.SSC_XJ, "https://api.api861861.com/CQShiCai/getBaseCQShiCaiList.do?lotCode=10004");
+        resultListMap.put(LotteryCategoryEnum.SSC_XJ, "https://api.api861861.com/CQShiCai/getBaseCQShiCaiList.do?date={0}&lotCode=10004");
+
+        //幸运飞艇
+        resultUrlMap.put(LotteryCategoryEnum.PK10_XYFT, "https://api.api861861.com/pks/getLotteryPksInfo.do?lotCode=10057");
+        resultListMap.put(LotteryCategoryEnum.PK10_XYFT, "https://api.api861861.com/pks/getPksHistoryList.do?date={0}&lotCode=10057");
+
 
         //北京快三
         serviceResult.put(LotteryCategoryEnum.KS_BJ, new ILotteryResultService() {
@@ -233,6 +247,13 @@ public class LotteryResultUtils {
                 doSyncData(LotteryCategoryEnum.PK10_BJ, "10001");
             }
         });
+        //幸运飞艇
+        serviceResult.put(LotteryCategoryEnum.PK10_XYFT,new ILotteryResultService(){
+            @Override
+            public void syncLotteryResult() {
+                doSyncData(LotteryCategoryEnum.PK10_XYFT, "10057");
+            }
+        });
         //香港六合彩
         serviceResult.put(LotteryCategoryEnum.LHC_XG, new ILotteryResultService() {
             @Override
@@ -241,7 +262,7 @@ public class LotteryResultUtils {
             }
         });
 
-        //幸运飞艇
+        //PC蛋蛋幸运28
         serviceResult.put(LotteryCategoryEnum.XY28_GW, new ILotteryResultService() {
             @Override
             public void syncLotteryResult() {
@@ -350,13 +371,14 @@ public class LotteryResultUtils {
         }
     }
 
-    private void drawPeriodList(LotteryCategoryEnum category, String lotteryCode) {
+    private void drawPeriodList(LotteryCategoryEnum category, String lotteryCode, String date) {
         String url = resultListMap.get(category);
         String resultContent = null;
         if (StringUtils.isNotBlank(url)) {
+            url = MessageFormat.format(url, date);
             resultContent = httpClientUtil.sendHttpGet(url);
         } else {
-            resultContent = httpClientUtil.sendHttpGet("https://api.api861861.com/lotteryJSFastThree/getJSFastThreeList.do?date=&lotCode=" + lotteryCode);
+            resultContent = httpClientUtil.sendHttpGet("https://api.api861861.com/lotteryJSFastThree/getJSFastThreeList.do?date=" + date + "&lotCode=" + lotteryCode);
         }
         try {
             if (!resultContent.startsWith("{")) {
