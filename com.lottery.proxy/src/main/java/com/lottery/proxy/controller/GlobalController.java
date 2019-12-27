@@ -53,6 +53,20 @@ public class GlobalController extends AbstractClientController {
                 }
                 return keyValues;
             }
+            if ("lottery".equalsIgnoreCase(type)) {
+                LotteryCategoryEnum[] types = LotteryCategoryEnum.values();
+                List<LotteryCategoryEnum> typeList = new ArrayList<>();
+                for (LotteryCategoryEnum item : types) {
+                    if (item.getParent() != null) {
+                        typeList.add(item);
+                        HashMap<String, Object> itemValue = new HashMap<>();
+                        itemValue.put("value", item.getValue());
+                        itemValue.put("name", item.getName());
+                        keyValues.add(itemValue);
+                    }
+                }
+                return keyValues;
+            }
             Class currentEnum = glosseryItems.get(type);
             for (Object o : currentEnum.getEnumConstants()) {
                 IGlossary v = (IGlossary) o;

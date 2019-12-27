@@ -143,9 +143,16 @@ public class PeriodSettlePrizeJobHandler extends IJobHandler {
         upPeriod.setOrderMoney(periodResult.getOrderMoney());
         upPeriod.setMoney(periodResult.getPrizeMoney());
         BigDecimal profileMoney = periodResult.getOrderMoney().subtract(periodResult.getPrizeMoney());
-        BigDecimal rate = profileMoney.divide(periodResult.getOrderMoney(), 2, BigDecimal.ROUND_HALF_DOWN);
+        if(profileMoney.compareTo(BigDecimal.ZERO)==0){
+            upPeriod.setRate(BigDecimal.ZERO);
+        }
+        else{
+            BigDecimal rate = profileMoney.divide(periodResult.getOrderMoney(), 2, BigDecimal.ROUND_HALF_DOWN);
+            upPeriod.setRate(rate);
+        }
+
         upPeriod.setProfileMoney(profileMoney);
-        upPeriod.setRate(rate);
+
         lotteryPeriodService.save(upPeriod);
     }
 

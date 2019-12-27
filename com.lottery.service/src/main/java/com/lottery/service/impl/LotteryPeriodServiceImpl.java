@@ -117,7 +117,7 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
         });
         //pk10生成结果
         resultBuilderMap.put(LotteryCategoryEnum.PK10, () -> {
-            List<String> codes =new ArrayList<>(Arrays.asList(CodeEnum.PK10_CODE_NUMBER.getCodes()));
+            List<String> codes = new ArrayList<>(Arrays.asList(CodeEnum.PK10_CODE_NUMBER.getCodes()));
             //彩票号码个数
             int size = 10;
             //号码重复
@@ -138,7 +138,7 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
             return buildPeriodResult(codes, size, repeat, sort);
         });
         //十一选五
-        resultBuilderMap.put(LotteryCategoryEnum.SYX5,()->{
+        resultBuilderMap.put(LotteryCategoryEnum.SYX5, () -> {
             List<String> codes = new ArrayList<>(Arrays.asList(CodeEnum.SYXW_NUMBER.getCodes()));
             //彩票号码个数
             int size = 5;
@@ -276,16 +276,16 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
      * @param configs
      * @return
      */
-    public List<PeriodResult> caculateResult(LotteryCategoryEnum lotteryType, List<OrderInfo> orderList, Map<String,JSONArray> configs) {
+    public List<PeriodResult> caculateResult(LotteryCategoryEnum lotteryType, List<OrderInfo> orderList, Map<String, JSONArray> configs) {
         List<PeriodResult> resultCaculate = new ArrayList<>();
-        LotteryCategoryEnum rootLottery=lotteryType;
-        if(rootLottery.getParent()!=null){
-            rootLottery=rootLottery.getParent();
+        LotteryCategoryEnum rootLottery = lotteryType;
+        if (rootLottery.getParent() != null) {
+            rootLottery = rootLottery.getParent();
         }
 
         List<String> resultList = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
-            if(orderList.size()==0){
+            if (orderList.size() == 0) {
                 String result = resultBuilderMap.get(rootLottery).buildResult();
                 PeriodResult resultItem = new PeriodResult();
                 resultItem.setResult(result);
@@ -410,7 +410,11 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
      * @return
      */
     public String getCollectionName(LotteryCategoryEnum lotteryType, String proxyId) {
+        if (lotteryType.getPrivateLottery() == YesOrNoEnum.NO) {
+            proxyId = "";
+        }
         proxyId = String.valueOf(NumberUtils.toInt(proxyId));
+
         if ("0".equals(proxyId)) {
             return "period_" + lotteryType.name();
         }
@@ -477,7 +481,7 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
     }
 
     @Override
-    public PeriodResult doSettle(LotteryCategoryEnum type, String proxyId, String periodId, String result, Map<String,JSONArray> configMaps) {
+    public PeriodResult doSettle(LotteryCategoryEnum type, String proxyId, String periodId, String result, Map<String, JSONArray> configMaps) {
         PeriodResult periodResult = new PeriodResult();
         BigDecimal totalPrizeMoney = BigDecimal.ZERO;
         BigDecimal totalOrderMoney = BigDecimal.ZERO;
@@ -686,6 +690,7 @@ public class LotteryPeriodServiceImpl extends AbstractMongoService implements Lo
             query.addCriteria(criteria);
         }
         long count = template.count(query, LotteryPeriod.class, collectionName);
+        period.setOrderColumn("resultDate");
         Sort sort = buildSort(period);
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         query.with(pageRequest);
