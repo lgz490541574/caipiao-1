@@ -34,7 +34,7 @@ public class LotteryController extends AbstractClientController {
     public Page<LotteryPeriodDto> list(@RequestBody LotteryPeriodDto dto) {
         String proxyId = getUser().getProxyId();
         dto.setProxyId(proxyId);
-        Page<LotteryPeriod> page = lotteryPeriodService.queryByPage(BeanCoper.copyProperties(LotteryPeriod.class, dto), dto.getPageinfo().getPage());
+        Page<LotteryPeriod> page = lotteryPeriodService.queryByPage(clone(LotteryPeriod.class, dto), dto.getPageinfo().getPage());
         for(LotteryPeriod item:page.getContent()){
             item.setLotteryType(dto.getLotteryType());
         }

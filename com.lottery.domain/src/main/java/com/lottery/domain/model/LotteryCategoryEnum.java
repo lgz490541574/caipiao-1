@@ -158,7 +158,7 @@ public enum LotteryCategoryEnum implements IGlossary {
     /**
      * 九州11选五
      */
-    SYX5_JZ(SYX5, 805, "九州11选五", YesOrNoEnum.NO, new IssureRule(800, 9, 0, 0, 1)),
+    SYX5_JZ(SYX5, 805, "九州11选五", YesOrNoEnum.YES, new IssureRule(800, 9, 0, 0, 1)),
 
     /**
      * 快乐11选五

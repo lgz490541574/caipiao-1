@@ -80,7 +80,8 @@ public class LotteryResultUtils {
 
         //如果不是六合彩则拉取详情
         if (category != LotteryCategoryEnum.LHC_XG) {
-            if (new DateTime(period.getResultDate()).plusMinutes(category.getRule().getLongTime()).toDate().before(DateTime.now().toDate())) {
+            DateTime dateTime = new DateTime(period.getResultDate()).plusMinutes(category.getRule().getLongTime());
+            if (dateTime.toDate().before(DateTime.now().toDate())) {
                 DateTime day = new DateTime(period.getResultDate());
                 String date = "";
                 if (day.plusDays(1).getDayOfYear() == DateTime.now().getDayOfYear()) {
@@ -141,8 +142,8 @@ public class LotteryResultUtils {
         resultListMap.put(LotteryCategoryEnum.SSC_TJ, "https://api.api861861.com/CQShiCai/getBaseCQShiCaiList.do?date={0}&lotCode=10003");
 
         //PC蛋蛋幸运28
-        resultUrlMap.put(LotteryCategoryEnum.XY28_GW, "https://api.api861861.com/pks/getLotteryPksInfo.do?lotCode=10057");
-        resultListMap.put(LotteryCategoryEnum.XY28_GW, "https://api.api861861.com/pks/getPksHistoryList.do?date={0}&lotCode=10057");
+        resultUrlMap.put(LotteryCategoryEnum.XY28_GW, "https://api.api861861.com/LuckTwenty/getPcLucky28.do?&lotCode=10046");
+        resultListMap.put(LotteryCategoryEnum.XY28_GW, "https://api.api861861.com/LuckTwenty/getPcLucky28List.do?date={0}&lotCode=10046");
 
         //新疆时时彩
         resultUrlMap.put(LotteryCategoryEnum.SSC_XJ, "https://api.api861861.com/CQShiCai/getBaseCQShiCai.do?lotCode=10004");
@@ -266,7 +267,7 @@ public class LotteryResultUtils {
         serviceResult.put(LotteryCategoryEnum.XY28_GW, new ILotteryResultService() {
             @Override
             public void syncLotteryResult() {
-                doSyncData(LotteryCategoryEnum.XY28_GW, "10057");
+                doSyncData(LotteryCategoryEnum.XY28_GW, "10046");
             }
         });
 
