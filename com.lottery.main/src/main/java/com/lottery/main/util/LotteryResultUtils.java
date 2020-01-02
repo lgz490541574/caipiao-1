@@ -14,6 +14,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.joda.time.DateTime;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -83,13 +86,7 @@ public class LotteryResultUtils {
             DateTime dateTime = new DateTime(period.getResultDate()).plusMinutes(category.getRule().getLongTime());
             if (dateTime.toDate().before(DateTime.now().toDate())) {
                 DateTime day = new DateTime(period.getResultDate());
-                String date = "";
-                if (day.plusDays(1).getDayOfYear() == DateTime.now().getDayOfYear()) {
-                    date = DateUtil.formatDateTime(day.toDate(), "yyyy-MM-dd");
-                } else {
-                    date = DateUtil.formatDateTime(new Date(), "yyyy-MM-dd");
-                }
-                drawPeriodList(category, code, date);
+                drawPeriodList(category, code, DateUtil.formatDateTime(day.toDate(),"yyyy-MM-dd"));
                 return;
             }
         }

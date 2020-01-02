@@ -1,7 +1,6 @@
 package com.lottery.main.job;
 
 import com.common.util.RPCResult;
-import com.common.util.model.OrderTypeEnum;
 import com.common.util.model.YesOrNoEnum;
 import com.lottery.domain.Config;
 import com.lottery.domain.LotteryPeriod;
@@ -21,20 +20,16 @@ import com.passport.rpc.dto.ProxyDto;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 开奖
@@ -75,7 +70,6 @@ public class PeriodOpenJobHandler extends IJobHandler {
         }
 
 
-        CountDownLatch proxyCountDown = new CountDownLatch(list.size());
 
 
         //输赢配置
@@ -165,10 +159,8 @@ public class PeriodOpenJobHandler extends IJobHandler {
                 } catch (Exception e) {
                     log.error("PeriodOpenJobHandler.execute.error proxy={}", dto.getName(), e);
                 }
-                proxyCountDown.countDown();
             });
         }
-        proxyCountDown.await();
 
         CountDownLatch countDownLatch = new CountDownLatch(lotteryCategory.length);
         for (LotteryCategoryEnum category : lotteryCategory) {

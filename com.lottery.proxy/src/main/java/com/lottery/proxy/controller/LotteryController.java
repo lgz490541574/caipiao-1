@@ -3,6 +3,7 @@ package com.lottery.proxy.controller;
 import com.common.annotation.RoleResource;
 import com.common.util.BeanCoper;
 import com.common.util.GlosseryEnumUtils;
+import com.common.util.model.YesOrNoEnum;
 import com.lottery.domain.LotteryPeriod;
 import com.lottery.domain.model.LotteryCategoryEnum;
 import com.lottery.proxy.AbstractClientController;
@@ -72,6 +73,9 @@ public class LotteryController extends AbstractClientController {
         LotteryPeriod entity = clone(LotteryPeriod.class, dto);
         String proxyId = getUser().getProxyId();
         entity.setProxyId(proxyId);
+        if(dto.getResultStatus()== YesOrNoEnum.NO.getValue().intValue()){
+            entity.setReserveCode(new String[]{});
+        }
         lotteryPeriodService.save(entity);
     }
 

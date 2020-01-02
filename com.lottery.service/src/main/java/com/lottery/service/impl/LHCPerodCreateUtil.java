@@ -1,6 +1,7 @@
 package com.lottery.service.impl;
 
 import com.common.exception.ApplicationException;
+import com.common.mongo.SequenceId;
 import com.common.util.DateUtil;
 import com.common.util.model.YesOrNoEnum;
 import com.lottery.domain.LotteryPeriod;
@@ -16,7 +17,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -67,7 +72,7 @@ public class LHCPerodCreateUtil {
         for (Date date : dates) {
             String collectionName = lotteryPeriodService.getCollectionName(category, null);
             period = new LotteryPeriod();
-            period.setCode(String.valueOf(code));
+            period.setCode(DateUtil.formatDateTime(date,"yyyy")+getNextId());
             String dayItem = DateUtil.formatDateTime(date, "yyyy-MM-dd");
             DateTime openTime = new DateTime(DateUtil.parse(dayItem,"yyyy-MM-dd"));
             openTime = openTime.plusHours(21).plusMinutes(30);
@@ -85,7 +90,26 @@ public class LHCPerodCreateUtil {
 
     }
 
-
+    /**
+     * 获取下一个自增ID
+     *
+     * @return
+     * @author
+     */
+    private String  getNextId() {
+        Query query = new Query(Criteria.where("collName").is(lotteryPeriodService.getCollectionName(LotteryCategoryEnum.LHC_XG,null)));
+        Update update = new Update();
+        update.inc("seqId", new Long(1));
+        FindAndModifyOptions options = new FindAndModifyOptions();
+        options.upsert(true);
+        options.returnNew(true);
+        SequenceId seqId = secondaryTemplate.findAndModify(query, update, options, SequenceId.class);
+        String s = seqId.getSeqId() + "";
+        while (s.length()<3){
+            s="0"+s;
+        }
+        return s;
+    }
     /**
      * 获取六合彩开奖日期
      *
