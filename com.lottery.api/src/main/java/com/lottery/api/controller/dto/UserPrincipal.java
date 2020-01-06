@@ -9,6 +9,9 @@ public class UserPrincipal implements Principal {
 
     @Override
     public String getName() {
+        if(userDTO==null){
+            return null;
+        }
         return userDTO.getPin();
     }
 

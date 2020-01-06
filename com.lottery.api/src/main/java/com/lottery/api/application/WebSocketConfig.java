@@ -2,6 +2,7 @@ package com.lottery.api.application;
 
 import com.common.exception.BizException;
 import com.common.util.RPCResult;
+import com.common.util.StringUtils;
 import com.common.util.UrlUtiles;
 import com.lottery.api.controller.dto.UserPrincipal;
 import com.passport.rpc.UserRPCService;
@@ -39,6 +40,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
                 URI uri = request.getURI();
+                if(uri.toString().indexOf("token=")==-1){
+                    return new UserPrincipal(null);
+                }
                 String token = UrlUtiles.getUrlParams(uri.toString(), "token");
                 RPCResult<UserDTO> result = userRPCService.verificationToken(token);
                 if (result.getSuccess()) {
